@@ -371,6 +371,17 @@
           of \((\mathcal{S},\preceq)\) if \(i \prec j\) implies that \(i\) appears before \(j\) in \(\sigma\) &mdash;
           so a higher-priority constraint is always enforced later and can override a lower-priority one, never the reverse.
         </p>
+        <figure class="media-slot figure-card figure-narrow"
+                data-kind="image"
+                data-src="static/images/linear_extensions.png"
+                data-label="Poset and its linear extensions"
+                data-hint="Figures/Linear_Extensions.pdf">
+          <figcaption>
+            <strong>From a poset to admissible orders.</strong> (a) A safety poset over four constraints
+            \(c_1,\dots,c_4\), drawn as a Hasse diagram. (b) Its three linear extensions &mdash; total orders consistent with
+            the poset, each defining one admissible sequential safety execution.
+          </figcaption>
+        </figure>
         <div class="theorem-box">
           <div class="theorem-title">Definition (Poset-respecting safety)</div>
           <p>A policy satisfies poset-respecting safety if safety is enforced according to some linear extension of
