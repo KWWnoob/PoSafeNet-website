@@ -36,7 +36,8 @@ whether `static/pdfs/poster.pdf` exists.
 ## Adding figures and videos
 
 The paper figures were converted from the PDFs in `Figures/` (kept locally, git-ignored);
-the seven figures marked "Fig. N" are byte-identical to the arXiv v1 sources.
+the figures marked "Fig. N" are byte-identical to the arXiv v1 sources.
+The Results section shows only the vision-based driving experiment.
 
 Every figure and video on the page is a *drop-in slot*. The page loads the file at the path
 below. If the file does not exist yet, the page shows a dashed placeholder that names the
@@ -45,15 +46,11 @@ expected path. To fill a slot, put a file with that name in place; no HTML edits
 | Slot | Expected file | Source | Status |
 |---|---|---|---|
 | Teaser (Overview) | `static/images/teaser.png` | Fig. 1, `Figures/teaser_v3.pdf` | ✅ added |
-| Task safety posets | `static/images/task_posets.png` | Fig. 2, `Figures/Task_Hasse.pdf` | ✅ added |
+| Driving safety posets | `static/images/driving_posets.png` | `Figures/Task_Hasse_2_v2.pdf` (appendix figure) | ✅ added |
 | Inference time vs. batch | `static/images/batch_time.png` | Fig. 3a, `Figures/Batchtime.pdf` | ✅ added |
 | Training time vs. heads | `static/images/head_time.png` | Fig. 3b, `Figures/Headtime.pdf` | ✅ added |
-| 2D navigation trajectories | `static/images/exp1_traj.png` | Fig. 4, `Figures/Experiment1_traj.pdf` | ✅ added |
-| Manipulator trajectories | `static/images/exp2_traj.png` | Fig. 5, `Figures/Experiment2_traj.pdf` | ✅ added |
 | Driving trajectories | `static/images/exp3_traj.png` | Fig. 6, `Figures/Experiment3_traj2.pdf` | ✅ added |
 | Poset → linear extensions (Method) | `static/images/linear_extensions.png` | `Figures/Linear_Extensions.pdf` (not in arXiv v1) | ✅ added |
-| 2D navigation video | `static/videos/nav2d.mp4` | — | missing |
-| Manipulator video | `static/videos/manipulator.mp4` | — | missing |
 | VISTA rollout, Mixture | `static/videos/vista_mixture.mp4` | — | missing |
 | VISTA rollout, Hard | `static/videos/vista_hard.mp4` | — | missing |
 | Poster (header button) | `static/pdfs/poster.pdf` | — | missing |

@@ -445,38 +445,28 @@
   <div class="container is-max-desktop">
     <h2 class="section-title">Experimental Results</h2>
     <p class="lead">
-      PoSafeNet is evaluated on three tasks with different safety posets and compared against an end-to-end network
-      (E2E) and unstructured safety layers &mdash; BarrierNet, ABNet, and DFBNet &mdash; which flatten all constraints
-      into a single layer or introduce slack variables.
+      PoSafeNet is compared against an end-to-end network (E2E) and unstructured safety layers &mdash; BarrierNet,
+      ABNet, and DFBNet &mdash; which flatten all constraints into a single layer or introduce slack variables.
+      Here we highlight the vision-based end-to-end driving experiment; results on 2D multi-obstacle navigation and
+      constrained robot manipulation are reported in the <a href="https://arxiv.org/abs/2601.22356" target="_blank" rel="noopener">paper</a>.
     </p>
 
-    <figure class="media-slot figure-card"
-            data-kind="image"
-            data-src="static/images/task_posets.png"
-            data-label="Task safety posets"
-            data-hint="Paper Fig. 2 (Figures/Task_Hasse.pdf)">
-      <figcaption>
-        <strong>Task-specific safety posets.</strong> Left: unicycle navigation with mutually incomparable obstacle
-        constraints. Middle: manipulator task where joint-limit constraints take precedence over obstacle avoidance.
-        Right: vision-based driving where collision avoidance has higher priority than lane keeping.
-      </figcaption>
-    </figure>
 
     <div class="highlight-grid">
       <div class="highlight-card">
-        <div class="highlight-task">2D navigation</div>
+        <div class="highlight-task">VISTA driving</div>
         <div class="highlight-value">100%</div>
-        <div class="highlight-desc">feasible rollouts with non-negative obstacle-safety margins for both PoSafeNet variants</div>
-      </div>
-      <div class="highlight-card">
-        <div class="highlight-task">Manipulation</div>
-        <div class="highlight-value">0</div>
-        <div class="highlight-desc">joint-space (\(\phi\)) violation for both PoSafeNet variants, with 100% feasibility</div>
+        <div class="highlight-desc">pass rate (rollouts completed without collision) for both PoSafeNet variants</div>
       </div>
       <div class="highlight-card">
         <div class="highlight-task">VISTA driving</div>
-        <div class="highlight-value">100% / 0%</div>
-        <div class="highlight-desc">pass rate / crash rate for both PoSafeNet variants</div>
+        <div class="highlight-value">0%</div>
+        <div class="highlight-desc">crash rate for both PoSafeNet variants</div>
+      </div>
+      <div class="highlight-card">
+        <div class="highlight-task">VISTA driving</div>
+        <div class="highlight-value">1.23 / 2.73</div>
+        <div class="highlight-desc">minimum safety barrier value (Mixture / Hard) &mdash; positive, i.e. no obstacle-safety violation</div>
       </div>
     </div>
 
@@ -515,129 +505,27 @@
       All methods use identical settings and training protocols. Rows for PoSafeNet are highlighted.
     </p>
 
-    <!-- ---------- Experiment 1 ---------- -->
-    <div class="experiment-block">
-      <h3 class="subsection-title"><span class="exp-tag">Exp. 1</span> 2D robot multi-obstacle avoidance</h3>
-      <p>
-        A planar unicycle navigates to a goal while avoiding three circular obstacles. The three obstacle constraints are
-        mutually incomparable (an <em>antichain</em>), so any total order would impose arbitrary priorities. QP-based layers
-        must enforce them simultaneously (often infeasible) or with hand-tuned slack; PoSafeNet enumerates
-        poset-consistent linear extensions instead. Results over 100 stochastic rollouts (24 held-out test episodes with
-        repeated observation noise).
-      </p>
-      <div class="table-wrap">
-        <table class="results-table">
-          <thead>
-            <tr>
-              <th>Method</th><th>QP Succ.% ↑</th><th>Safety (min / mean)</th><th>MSE (mean / var) ↓</th>
-              <th>FinalDist ↓</th><th>Rollout time (s) ↓</th><th>Unc. (u1, u2)</th><th>Feasibility</th><th>Top safety guarantee</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>E2E</td><td>100</td><td>−81.00 / 3.24</td><td>5.72×10<sup>2</sup> / 1.26×10<sup>7</sup></td><td>26.57</td><td>0.028</td><td>(4.87, 20.98)</td><td class="yes">✓</td><td class="no">✗</td></tr>
-            <tr><td>DFB (slack=0)</td><td>78</td><td>−80.78 / 48.68</td><td>8.50×10<sup>−2</sup> / 3.46×10<sup>−2</sup></td><td>19.43</td><td>5.52</td><td>(0.251, 0.313)</td><td class="no">✗</td><td class="no">✗</td></tr>
-            <tr><td>DFB (slack=10<sup>3</sup>)</td><td>100</td><td>0.144 / 44.66</td><td>2.47×10<sup>−2</sup> / 4.05×10<sup>−4</sup></td><td>15.40</td><td>6.57</td><td>(0.146, 0.167)</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-            <tr><td>BarrierNet (slack=0)</td><td>44</td><td>−43.99 / 16.94</td><td>1.96×10<sup>−2</sup> / 3.82×10<sup>−4</sup></td><td>7.81</td><td>7.09</td><td>(0.136, 0.113)</td><td class="no">✗</td><td class="no">✗</td></tr>
-            <tr><td>BarrierNet (slack=10<sup>3</sup>)</td><td>83</td><td>−1.90×10<sup>−5</sup> / 32.59</td><td>3.27×10<sup>−2</sup> / 1.37×10<sup>−3</sup></td><td>14.05</td><td>7.54</td><td>(0.162, 0.198)</td><td class="no">✗</td><td class="no">✗</td></tr>
-            <tr><td>ABNet (slack=0)</td><td>35</td><td>−61.28 / 44.41</td><td>9.45×10<sup>−2</sup> / 7.04×10<sup>−2</sup></td><td>13.14</td><td>36.37</td><td>(0.102, 0.383)</td><td class="no">✗</td><td class="no">✗</td></tr>
-            <!-- TODO(authors): the arXiv v1 footnote attributes non-convergence to "ABNet (slack=0)", but the dagger marks this slack=10^3 row; please verify -->
-            <tr><td>ABNet (slack=10<sup>3</sup>)<sup>†</sup></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr class="ours"><td>PoSafeNet (Mixture)</td><td>100</td><td>1.63 / 37.20</td><td>2.92×10<sup>−2</sup> / 1.61×10<sup>−3</sup></td><td>12.41</td><td>1.51</td><td>(0.152, 0.185)</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-            <tr class="ours"><td>PoSafeNet (Hard)</td><td>100</td><td>0.00 / 31.63</td><td>2.03×10<sup>−2</sup> / 4.36×10<sup>−4</sup></td><td>10.95</td><td>0.276</td><td>(0.132, 0.132)</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="table-note"><sup>†</sup> Training failed to converge; metrics are not reported. Values below 10<sup>−11</sup> are treated as zero.
-        MSE is w.r.t. the reference trajectory; <em>Top safety guarantee</em> means Safety ≥ 0 throughout the rollout.</p>
-      <div class="columns is-variable is-4">
-        <div class="column is-7">
-          <figure class="media-slot figure-card"
-                  data-kind="image"
-                  data-src="static/images/exp1_traj.png"
-                  data-label="2D navigation trajectories"
-                  data-hint="Paper Fig. 4 (Figures/Experiment1_traj.pdf)">
-            <figcaption>Representative closed-loop trajectories (dashed black: reference). Unstructured baselines exhibit
-              conservative detours or safety violations; PoSafeNet produces smooth, goal-directed trajectories while
-              maintaining safety.</figcaption>
-          </figure>
-        </div>
-        <div class="column is-5">
-          <figure class="media-slot figure-card"
-                  data-kind="video"
-                  data-src="static/videos/nav2d.mp4"
-                  data-label="2D navigation video"
-                  data-hint="e.g. a PoSafeNet closed-loop rollout">
-            <figcaption>2D navigation rollout.</figcaption>
-          </figure>
-        </div>
-      </div>
-    </div>
-
-    <!-- ---------- Experiment 2 ---------- -->
-    <div class="experiment-block">
-      <h3 class="subsection-title"><span class="exp-tag">Exp. 2</span> Safe robot manipulation under joint constraints</h3>
-      <p>
-        A two-link planar manipulator tracks a reference end-effector trajectory under joint limits and obstacle
-        avoidance. Joint-space constraints (the \(\phi\) safety measure) take precedence over end-effector safety,
-        inducing a non-trivial poset with strict priority relations. Results on the held-out test set.
-      </p>
-      <div class="table-wrap">
-        <table class="results-table">
-          <thead>
-            <tr>
-              <th>Method</th><th>QP Succ.% ↑</th><th>Safety (min / mean)</th><th>MSE (mean / var) ↓</th>
-              <th>\(\phi\) (mean / max) ↓</th><th>FinalDist ↓</th><th>Rollout time (s) ↓</th><th>Feasibility</th><th>Top safety guarantee</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>E2E</td><td>100</td><td>−12.04 / 2.30</td><td>9.64×10<sup>−3</sup> / 1.06×10<sup>−4</sup></td><td>2.53×10<sup>−2</sup> / 1.98×10<sup>−1</sup></td><td>0.702</td><td>0.021</td><td class="yes">✓</td><td class="no">✗</td></tr>
-            <tr><td>DFBNet (slack=0)</td><td>100</td><td>−14.99 / −10.74</td><td>4.04×10<sup>−1</sup> / 3.95×10<sup>−2</sup></td><td>4.05×10<sup>−2</sup> / 3.26×10<sup>−1</sup></td><td>2.53</td><td>1.62</td><td class="yes">✓</td><td class="no">✗</td></tr>
-            <tr><td>DFBNet (slack=10<sup>3</sup>)</td><td>100</td><td>−14.84 / −8.08</td><td>3.86×10<sup>−1</sup> / 3.48×10<sup>−2</sup></td><td>4.99×10<sup>−6</sup> / 4.56×10<sup>−5</sup></td><td>2.29</td><td>1.71</td><td class="yes">✓</td><td class="no">✗</td></tr>
-            <tr><td>BarrierNet (slack=0)</td><td>100</td><td>−9.63 / 2.23</td><td>1.33×10<sup>−2</sup> / 1.39×10<sup>−4</sup></td><td>3.29×10<sup>−2</sup> / 2.51×10<sup>−1</sup></td><td>0.672</td><td>1.59</td><td class="yes">✓</td><td class="no">✗</td></tr>
-            <tr><td>BarrierNet (slack=10<sup>3</sup>)</td><td>100</td><td>−4.07 / 2.21</td><td>1.21×10<sup>−2</sup> / 1.39×10<sup>−4</sup></td><td>0.0000 / 0.0000</td><td>0.410</td><td>1.60</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-            <tr><td>ABNet (slack=0)</td><td>76</td><td>−14.35 / 43.13</td><td>1.46×10<sup>116</sup> / 1.60×10<sup>234</sup></td><td>0.417 / 0.838</td><td>NaN</td><td>0.550</td><td class="no">✗</td><td class="no">✗</td></tr>
-            <tr><td>ABNet (slack=10<sup>3</sup>)</td><td>84</td><td>31.03 / 62.05</td><td>4.20 / 1.48×10<sup>2</sup></td><td>0.167 / 0.837</td><td>9.48</td><td>0.544</td><td class="no">✗</td><td class="no">✗</td></tr>
-            <tr class="ours"><td>PoSafeNet (Mixture)</td><td>100</td><td>0.199 / 2.44</td><td>9.08×10<sup>−3</sup> / 1.12×10<sup>−4</sup></td><td>0.0000 / 0.0000</td><td>0.361</td><td>0.173</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-            <tr class="ours"><td>PoSafeNet (Hard)</td><td>100</td><td>0.018 / 1.38</td><td>1.04×10<sup>−2</sup> / 1.27×10<sup>−4</sup></td><td>0.0000 / 0.0000</td><td>0.527</td><td>0.095</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="table-note">\(\phi\) quantifies joint-space violation; <em>Top safety guarantee</em> means zero \(\phi\)-violation
-        throughout the rollout. Both PoSafeNet variants satisfy all joint constraints; hard selection has lower computation
-        cost and the mixture lower reference error.</p>
-      <div class="columns is-variable is-4">
-        <div class="column is-7">
-          <figure class="media-slot figure-card"
-                  data-kind="image"
-                  data-src="static/images/exp2_traj.png"
-                  data-label="Manipulator trajectories"
-                  data-hint="Paper Fig. 5 (Figures/Experiment2_traj.pdf)">
-            <figcaption>Representative end-effector trajectories (dashed black: reference). Unstructured methods exhibit
-              oscillatory or unstable behavior near joint limits; PoSafeNet closely tracks the reference while respecting
-              joint-space safety.</figcaption>
-          </figure>
-        </div>
-        <div class="column is-5">
-          <figure class="media-slot figure-card"
-                  data-kind="video"
-                  data-src="static/videos/manipulator.mp4"
-                  data-label="Manipulator video"
-                  data-hint="e.g. a PoSafeNet closed-loop rollout">
-            <figcaption>Two-link manipulator rollout.</figcaption>
-          </figure>
-        </div>
-      </div>
-    </div>
-
     <!-- ---------- Experiment 3 ---------- -->
     <div class="experiment-block">
-      <h3 class="subsection-title"><span class="exp-tag">Exp. 3</span> Vision-based end-to-end autonomous driving</h3>
+      <h3 class="subsection-title"><span class="exp-tag">VISTA</span> Vision-based end-to-end autonomous driving</h3>
       <p>
         Policies map raw camera images to controls in the <code>VISTA</code> data-driven simulator. Safety constraints include
         collision avoidance and lane keeping; collision avoidance takes precedence, so lane keeping may be temporarily
         violated to preserve higher-priority safety. BarrierNet and ABNet are also reported without lane constraints for
         comparability. Results on the held-out test set.
       </p>
+      <figure class="media-slot figure-card figure-narrow"
+              data-kind="image"
+              data-src="static/images/driving_posets.png"
+              data-label="Driving safety posets"
+              data-hint="Figures/Task_Hasse_2_v2.pdf">
+        <figcaption>
+          <strong>Task-specific safety posets used in the vision-based driving experiments, visualized as Hasse diagrams.</strong>
+          Left: a two-level hierarchy where obstacle avoidance has higher priority than left and right lane boundary constraints.
+          Right: a four-level hierarchy that augments the two-level structure with intermediate speed regulation and
+          low-priority centerline adherence, while preserving obstacle avoidance as the highest-priority constraint.
+        </figcaption>
+      </figure>
       <div class="table-wrap">
         <table class="results-table">
           <thead>
