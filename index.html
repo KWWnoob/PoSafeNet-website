@@ -1,624 +1,722 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PoSafeNet: Structured Safety Learning via Compositional Projection</title>
-  <meta name="description" content="PoSafeNet (NeurIPS 2026): a differentiable neural safety layer that enforces poset-structured safety constraints via sequential closed-form projection.">
-  <meta name="keywords" content="PoSafeNet, safe learning, control barrier functions, partially ordered set, poset, structured safety, robot learning, NeurIPS 2026">
-  <meta name="author" content="Kiwan Wong, Wei Xiao, Daniela Rus">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PoSafeNet | NeurIPS 2026</title>
+<meta name="description" content="PoSafeNet: Structured Safety Learning via Compositional Projection">
+<meta name="author" content="Kiwan Wong, Wei Xiao, Daniela Rus">
 
-  <!-- Social preview (add static/images/social_preview.png, 1200x630, then use an absolute URL after deployment) -->
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="PoSafeNet: Safe Learning with Poset-Structured Neural Nets">
-  <meta property="og:description" content="A differentiable neural safety layer that enforces poset-structured safety via sequential closed-form projection. NeurIPS 2026.">
-  <meta property="og:image" content="static/images/social_preview.png">
-  <meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 
-  <!-- Google Scholar -->
-  <meta name="citation_title" content="PoSafeNet: Safe Learning with Poset-Structured Neural Nets">
-  <meta name="citation_author" content="Wong, Kiwan">
-  <meta name="citation_author" content="Xiao, Wei">
-  <meta name="citation_author" content="Rus, Daniela">
-  <meta name="citation_publication_date" content="2026">
-  <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2601.22356">
-
-  <link rel="icon" type="image/svg+xml" href="static/images/favicon.svg">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <link rel="stylesheet" href="static/css/index.css">
-
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-  <script defer src="static/js/index.js"></script>
+<style>
+:root {
+  --primary:#345cbd;
+  --ink:#1c2940;
+  --muted:#64748b;
+  --line:#e2e8f0;
+  --soft:#f7f9fd;
+  --white:#fff;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  margin:0;
+  font-family:Inter,Arial,sans-serif;
+  color:var(--ink);
+  line-height:1.75;
+  background:white;
+}
+a { color:var(--primary);text-decoration:none; }
+a:hover { text-decoration:underline; }
+.container { max-width:1080px;margin:auto;padding:0 24px; }
+.narrow { max-width:900px; }
+nav {
+  position:sticky;top:0;z-index:20;
+  background:rgba(255,255,255,.96);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(12px);
+}
+.nav-inner {
+  display:flex;align-items:center;
+  justify-content:space-between;
+  gap:20px;padding-top:13px;padding-bottom:13px;
+}
+.brand { font-weight:800;color:var(--ink);font-size:19px; }
+.nav-links { display:flex;gap:22px;flex-wrap:wrap; }
+.nav-links a { font-size:13px;color:#475569; }
+.hero {
+  text-align:center;
+  padding:86px 20px 66px;
+  background:linear-gradient(180deg,#f1f5ff 0%,#fff 100%);
+}
+.venue {
+  display:inline-block;
+  background:#e5ecff;color:#284da6;
+  border-radius:100px;padding:5px 16px;
+  font-size:13px;font-weight:700;
+}
+h1 {
+  font-size:clamp(30px,4.7vw,50px);
+  line-height:1.19;letter-spacing:-1.8px;
+  margin:24px auto;max-width:1000px;
+}
+.accent { color:var(--primary); }
+.authors { font-size:18px;margin-top:24px; }
+.affiliations,.venue-text {
+  color:var(--muted);font-size:14px;
+  margin-top:9px;
+}
+.buttons {
+  display:flex;justify-content:center;
+  flex-wrap:wrap;gap:12px;margin-top:30px;
+}
+.btn {
+  padding:10px 19px;border-radius:9px;
+  border:1px solid #cdd6e7;
+  color:#283957;background:white;
+  font-weight:600;font-size:14px;
+}
+.btn.primary { background:var(--primary);color:white;border-color:var(--primary); }
+.section { padding:72px 0; }
+.alt { background:var(--soft); }
+h2 {
+  font-size:30px;letter-spacing:-.8px;
+  margin:0 0 22px;
+}
+h3 { font-size:21px;margin:0 0 12px; }
+h4 { font-size:16px;margin:0 0 10px; }
+p { margin:0 0 18px; }
+.lead { color:#475569;font-size:17px; }
+figure { margin:26px 0; }
+.figure {
+  background:white;border:1px solid var(--line);
+  border-radius:14px;padding:19px;
+}
+.figure img { display:block;max-width:100%;margin:auto; }
+figcaption {
+  margin-top:14px;font-size:13px;
+  line-height:1.6;color:var(--muted);
+}
+.tldr {
+  background:#eef3ff;border-left:4px solid var(--primary);
+  padding:22px 26px;border-radius:9px;margin:30px 0;
+}
+.tldr strong { color:#244ca4; }
+.grid3,.grid4,.stats {
+  display:grid;gap:16px;margin:26px 0;
+}
+.grid3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.grid4 { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.stats { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.card,.stat {
+  background:white;border:1px solid var(--line);
+  border-radius:12px;padding:21px;
+}
+.card p { font-size:14px;color:#566579;margin:0; }
+.card h3 { font-size:16px; }
+.card .num { font-size:13px;font-weight:800;color:var(--primary); }
+.stat { text-align:center; }
+.stat .value { font-size:30px;font-weight:800;color:var(--primary); }
+.stat .label { font-size:13px;color:var(--muted); }
+.question {
+  padding:24px;font-size:18px;font-weight:600;
+  background:#f1f5ff;border-left:4px solid #8da6ee;
+  margin:28px 0;
+}
+.method-step {
+  display:grid;grid-template-columns:44px 1fr;
+  gap:19px;margin:30px 0;
+}
+.step-num {
+  background:#e9efff;color:var(--primary);
+  width:40px;height:40px;display:grid;
+  place-items:center;border-radius:50%;font-weight:800;
+}
+.equation {
+  overflow-x:auto;
+  padding:17px;margin:16px 0;
+  border:1px solid var(--line);
+  background:white;border-radius:8px;
+  text-align:center;
+}
+.theorem {
+  background:white;border-left:3px solid var(--primary);
+  padding:18px 20px;margin:16px 0;
+  border-radius:6px;
+}
+.theorem p { margin:0;font-size:14px; }
+.note {
+  background:#f1f5ff;
+  padding:19px 23px;border-radius:9px;
+  font-size:14px;margin:22px 0;
+}
+.table-wrap {
+  overflow-x:auto;
+  border:1px solid var(--line);
+  border-radius:10px;margin:23px 0;
+}
+table {
+  border-collapse:collapse;
+  width:100%;min-width:880px;
+  font-size:12px;line-height:1.45;
+}
+th,td {
+  padding:11px 12px;
+  text-align:center;
+  border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+th:first-child,td:first-child { text-align:left; }
+th { background:#edf2fc;color:#273e72;font-weight:700; }
+tbody tr:hover:not(.group) { background:#f8faff; }
+tr.group td {
+  background:#f1f4f9;font-weight:700;
+  font-style:italic;text-align:left;
+  color:#34445f;
+}
+tr.ours { background:#edf4ff; }
+tr.ours td:first-child { font-weight:800;color:#244ca4; }
+.table-note {
+  color:var(--muted);font-size:12px;line-height:1.65;
+}
+.experiment { margin:44px 0 64px; }
+.experiment .tag {
+  font-weight:700;color:var(--primary);
+  font-size:12px;letter-spacing:1px;
+}
+.figure-grid {
+  display:grid;grid-template-columns:1fr 1fr;gap:18px;
+}
+.videos { display:grid;grid-template-columns:1fr 1fr;gap:18px; }
+video { width:100%;border-radius:10px; }
+ul { padding-left:22px; }
+li { margin:12px 0; }
+pre {
+  overflow-x:auto;
+  background:#17243b;color:#e7efff;
+  border-radius:11px;padding:22px;
+  font-size:13px;line-height:1.6;
+}
+.copy {
+  cursor:pointer;border:1px solid #cbd5e1;
+  padding:7px 13px;background:white;
+  border-radius:7px;font-family:inherit;
+}
+.footer {
+  padding:34px 0;background:#f3f6fc;
+  color:var(--muted);font-size:12px;
+}
+@media(max-width:720px) {
+  .nav-links { gap:10px; }
+  .nav-links a { font-size:11px; }
+  .grid3,.grid4,.stats,.figure-grid,.videos { grid-template-columns:1fr; }
+  .section { padding:48px 0; }
+  .hero { padding:56px 14px; }
+  h2 { font-size:26px; }
+  .authors { font-size:15px; }
+}
+</style>
 </head>
+
 <body>
 
-<a class="skip-link" href="#main-content">Skip to content</a>
-
-<!-- ============ Sticky section navigation ============ -->
-<nav class="section-nav" aria-label="Sections">
-  <div class="section-nav-inner">
-    <a class="section-nav-brand" href="#top">PoSafeNet</a>
-    <div class="section-nav-links">
+<nav>
+  <div class="container nav-inner">
+    <a class="brand" href="#top">PoSafeNet</a>
+    <div class="nav-links">
       <a href="#overview">Overview</a>
       <a href="#abstract">Abstract</a>
       <a href="#motivation">Motivation</a>
       <a href="#method">Method</a>
       <a href="#results">Results</a>
+      <a href="#limitations">Limitations</a>
       <a href="#citation">Citation</a>
     </div>
   </div>
 </nav>
 
-<main id="main-content">
-
-<!-- ============ Header ============ -->
-<header class="hero paper-header" id="top">
-  <div class="hero-body">
-    <div class="container is-max-desktop has-text-centered">
-      <div class="venue-badge">NeurIPS 2026</div>
-      <h1 class="title is-1 publication-title">
-        <span class="title-accent">PoSafeNet</span>: Safe Learning with<br class="is-hidden-mobile"> Poset-Structured Neural Nets
-      </h1>
-
-      <!-- TODO(authors): add personal homepage links to the author names if desired -->
-      <div class="publication-authors">
-        <span class="author-block">Kiwan Wong<sup>1</sup>,</span>
-        <span class="author-block">Wei Xiao<sup>2,1</sup>,</span>
-        <span class="author-block">Daniela Rus<sup>1</sup></span>
-      </div>
-      <div class="publication-affiliations">
-        <span class="author-block"><sup>1</sup>MIT CSAIL</span>
-        <span class="author-block"><sup>2</sup>Nanyang Technological University</span>
-      </div>
-      <div class="publication-venue">Conference on Neural Information Processing Systems (NeurIPS), 2026</div>
-
-      <div class="publication-links">
-        <a class="link-button" href="https://arxiv.org/pdf/2601.22356" target="_blank" rel="noopener">
-          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
-          <span>Paper</span>
-        </a>
-        <a class="link-button" href="https://arxiv.org/abs/2601.22356" target="_blank" rel="noopener">
-          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l16 16M20 4L4 20"/></svg>
-          <span>arXiv</span>
-        </a>
-        <!-- TODO(authors): confirm this is the public code repository -->
-        <a class="link-button" href="https://github.com/KWWnoob/PoSafeNet_Official" target="_blank" rel="noopener">
-          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 17.13V21"/></svg>
-          <span>Code</span>
-        </a>
-        <!-- Poster: drop the PDF at static/pdfs/poster.pdf; the button activates automatically -->
-        <a class="link-button" id="poster-link" href="static/pdfs/poster.pdf" target="_blank" rel="noopener" data-asset-check>
-          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-          <span>Poster</span>
-        </a>
-        <a class="link-button" href="#citation">
-          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21c3 0 7-1 7-8V5H3v8h4M14 21c3 0 7-1 7-8V5h-7v8h4"/></svg>
-          <span>BibTeX</span>
-        </a>
-      </div>
+<header class="hero" id="top">
+  <div class="container">
+    <span class="venue">NeurIPS 2026</span>
+    <h1><span class="accent">PoSafeNet</span>: Structured Safety Learning via Compositional Projection</h1>
+    <div class="authors">
+      Kiwan Wong<sup>1</sup> · Wei Xiao<sup>2,3,1</sup> · Daniela Rus<sup>1,3</sup>
+    </div>
+    <div class="affiliations">
+      <sup>1</sup> MIT CSAIL ·
+      <sup>2</sup> Nanyang Technological University ·
+      <sup>3</sup> Singapore–MIT Alliance for Research and Technology
+    </div>
+    <div class="venue-text">40th Conference on Neural Information Processing Systems, 2026</div>
+    <div class="buttons">
+      <a class="btn primary" href="static/pdfs/paper_latest.pdf" target="_blank">Paper</a>
+      <a class="btn" href="https://arxiv.org/abs/2601.22356" target="_blank">arXiv</a>
+      <a class="btn" href="https://github.com/KWWnoob/PoSafeNet_Official" target="_blank">Code</a>
+      <a class="btn" href="static/pdfs/poster.pdf" target="_blank">Poster</a>
+      <a class="btn" href="#citation">BibTeX</a>
     </div>
   </div>
 </header>
 
-<!-- ============ Overview ============ -->
 <section class="section" id="overview">
-  <div class="container is-max-desktop">
-    <figure class="media-slot figure-card"
-            data-kind="image"
-            data-src="static/images/teaser.png"
-            data-label="Teaser figure"
-            data-hint="Paper Fig. 1 (Figures/teaser_v3.pdf)">
-      <figcaption>
-        <strong>Overview of PoSafeNet.</strong> A multi-head neural controller enforces safety through
-        sequential projections under multiple poset-consistent constraint orderings, and adaptively
-        combines the resulting safe executions via a soft mixture or a hard selection.
-      </figcaption>
-    </figure>
+<div class="container">
 
-    <div class="tldr">
-      <span class="tldr-label">TL;DR</span>
-      <p>
-        Real robots must satisfy many safety constraints at once, but these constraints are rarely
-        equally important or fully ranked. PoSafeNet models them as a <em>partially ordered set</em>
-        and enforces them by <em>sequential closed-form projection</em> along poset-consistent orders,
-        so priority semantics hold by construction &mdash; without solving a differentiable QP.
-      </p>
-    </div>
+<figure class="figure">
+  <img src="static/images/teaser.png" alt="PoSafeNet architecture overview">
+  <figcaption>
+    <strong>Figure 1. Overview of PoSafeNet.</strong>
+    Multiple neural projection heads execute different poset-consistent constraint orders. Outputs are combined through hard selection or convex mixture.
+  </figcaption>
+</figure>
 
-    <div class="contrib-grid">
-      <div class="contrib-card">
-        <div class="contrib-num">01</div>
-        <h3>Poset-structured safety</h3>
-        <p>A structural inductive bias for learning-based control that enables selective,
-          context-dependent resolution of heterogeneous safety priorities.</p>
-      </div>
-      <div class="contrib-card">
-        <div class="contrib-num">02</div>
-        <h3>Poset-respecting by construction</h3>
-        <p>Lower-priority constraints are violated only when necessary to enforce higher-priority ones.</p>
-      </div>
-      <div class="contrib-card">
-        <div class="contrib-num">03</div>
-        <h3>Closed-form &amp; efficient</h3>
-        <p>Safety is enforced by closed-form half-space projections, without solving differentiable QPs.</p>
-      </div>
-      <div class="contrib-card">
-        <div class="contrib-num">04</div>
-        <h3>Guarantees &amp; experiments</h3>
-        <p>Formal poset-respecting safety under standard assumptions, evaluated on navigation,
-          manipulation, and vision-based driving.</p>
-      </div>
-    </div>
+<div class="tldr">
+  <strong>TL;DR</strong>
+  <p>PoSafeNet treats multi-constraint safety as a structured composition problem. A designer-specified partial order defines admissible safety overrides, and differentiable closed-form projections realize these executions without solving an online QP.</p>
+</div>
+
+<div class="grid4">
+  <div class="card">
+    <span class="num">01</span>
+    <h3>Poset-structured safety</h3>
+    <p>Explicitly represent priority relations while leaving incomparable constraints unranked.</p>
   </div>
+  <div class="card">
+    <span class="num">02</span>
+    <h3>Closed-form projections</h3>
+    <p>Enforce CBF halfspaces sequentially instead of solving a joint optimization problem.</p>
+  </div>
+  <div class="card">
+    <span class="num">03</span>
+    <h3>Multi-head learning</h3>
+    <p>Learn nominal policies and safety gains with mixture or hard head selection.</p>
+  </div>
+  <div class="card">
+    <span class="num">04</span>
+    <h3>Experimental validation</h3>
+    <p>Evaluate navigation, manipulation and vision-based autonomous driving in simulation.</p>
+  </div>
+</div>
+
+</div>
 </section>
 
-<!-- ============ Abstract ============ -->
-<section class="section section-alt" id="abstract">
-  <div class="container is-max-desktop">
-    <h2 class="section-title">Abstract</h2>
-    <div class="abstract-text">
-      <p>
-        Safe learning is essential for deploying learning-based controllers in safety-critical robotic systems,
-        yet existing approaches often enforce multiple safety constraints uniformly or via fixed priority orders,
-        leading to infeasibility and brittle behavior.
-        In practice, safety requirements are heterogeneous and admit only partial priority relations,
-        where some constraints are comparable while others are inherently incomparable.
-        We formalize this setting as <em>poset-structured safety</em>, modeling safety constraints as a partially
-        ordered set and treating safety composition as a structural property of the policy class.
-        Building on this formulation, we propose PoSafeNet, a differentiable neural safety layer that enforces
-        safety via sequential closed-form projection under poset-consistent constraint orderings, enabling adaptive
-        selection or mixing of valid safety executions while preserving priority semantics by construction.
-        Experiments on multi-obstacle navigation, constrained robot manipulation, and vision-based autonomous
-        driving demonstrate improved feasibility, robustness, and scalability over unstructured and differentiable
-        quadratic program-based safety layers.
-      </p>
-    </div>
-  </div>
+<section class="section alt" id="abstract">
+<div class="container narrow">
+<h2>Abstract</h2>
+<p>
+Safe robot learning often involves multiple heterogeneous safety constraints that cannot always be satisfied simultaneously. Existing neural safety layers typically treat multi-constraint safety as a numerical optimization problem, enforcing all constraints through a single QP-based projection or relaxing conflicts with slack variables. This hides the semantic question of which constraints may be sacrificed under conflict inside solver geometry, penalty weights, or a fixed total hierarchy. We propose PoSafeNet, a poset-structured composable safety layer that makes these conflict semantics explicit. PoSafeNet encodes admissible safety override relations as a partial order and realizes each admissible execution by composing closed-form projections onto Control Barrier Function (CBF)-induced halfspaces. Across multi-obstacle navigation, constrained manipulation, and vision-based autonomous driving, PoSafeNet improves operational feasibility, computational efficiency, and task performance over Differentiable Quadratic Program (dQP)-based, slack-based, and hierarchical safety layers.
+</p>
+</div>
 </section>
 
-<!-- ============ Motivation ============ -->
 <section class="section" id="motivation">
-  <div class="container is-max-desktop">
-    <h2 class="section-title">Motivation</h2>
-    <p class="lead">
-      Most safe learning approaches implicitly assume that multiple safety constraints can be enforced
-      <em>symmetrically and simultaneously</em>, typically through a single optimization-based safety layer such
-      as a differentiable QP or differentiable MPC. In realistic robotic systems, however, safety constraints are
-      heterogeneous: they arise from distinct failure modes, physical limitations, and sensing modalities.
-    </p>
-
-    <div class="compare-grid">
-      <div class="compare-card is-bad">
-        <div class="compare-head">Simultaneous enforcement</div>
-        <div class="compare-sub">flat intersection, e.g. a single dQP</div>
-        <p>Forces the policy to resolve priority conflicts implicitly through optimization, which may lead to
-          infeasibility, excessive conservativeness, or unstable learning under noise and model mismatch.
-          Slack variables restore feasibility but allow violations of higher-priority constraints.</p>
-      </div>
-      <div class="compare-card is-bad">
-        <div class="compare-head">Fixed total order</div>
-        <div class="compare-sub">hierarchical / lexicographic</div>
-        <p>Imposes arbitrary priorities between constraints that are inherently incomparable &mdash;
-          e.g. the left and right lane boundaries in driving are individually valid yet structurally
-          incomparable safety primitives.</p>
-      </div>
-      <div class="compare-card is-good">
-        <div class="compare-head">Partial order (PoSafeNet)</div>
-        <div class="compare-sub">poset over safety primitives</div>
-        <p>Encodes <em>only</em> the necessary priority relations while leaving incomparable constraints unranked
-          &mdash; the minimal structure needed. The poset is a prior specified by the designer, not a learned object.</p>
-      </div>
-    </div>
-
-    <blockquote class="key-question">
-      How can we compose multiple safety-critical policies in a scalable and adaptive manner when the underlying
-      safety constraints admit only a partial order, rather than a single global priority?
-    </blockquote>
-
-    <p>
-      The central limitation of existing approaches lies not in the availability of safety certificates themselves,
-      but in the absence of a <strong>structural inductive bias</strong> governing how such constraints should be
-      composed. PoSafeNet casts safety composition as a <em>structured latent decision problem</em>: the policy
-      operates over a discrete set of safety-respecting executions rather than over unconstrained control actions,
-      decoupling the specification of safety structure from the learning of task behavior.
-    </p>
-  </div>
+<div class="container">
+<h2>Motivation</h2>
+<p class="lead">
+Multiple safety constraints may conflict. The important question is not simply how to satisfy them simultaneously, but which constraints are allowed to override others.
+</p>
+<div class="grid3">
+<div class="card">
+  <h3>Simultaneous enforcement</h3>
+  <p>Joint QP layers can become infeasible under conflicting constraints. Slack variables restore feasibility but may relax important safety conditions.</p>
+</div>
+<div class="card">
+  <h3>Fixed total hierarchy</h3>
+  <p>Hierarchical optimization assigns priorities to every constraint pair, even when no semantic priority relation exists.</p>
+</div>
+<div class="card">
+  <h3>Partial order (PoSafeNet)</h3>
+  <p>A partial order encodes only necessary safety overrides. Different linear extensions define admissible executions.</p>
+</div>
+</div>
+<div class="question">
+How can we efficiently compose safety constraints when the underlying priority relations form a partial order rather than a fixed total hierarchy?
+</div>
+</div>
 </section>
 
-<!-- ============ Method ============ -->
-<section class="section section-alt" id="method">
-  <div class="container is-max-desktop">
-    <h2 class="section-title">Method</h2>
+<section class="section alt" id="method">
+<div class="container">
+<h2>Method</h2>
 
-    <!-- Architecture schematic (drawn from Algorithm 1 of the paper) -->
-    <figure class="figure-card diagram-card">
-      <div class="diagram-scroll">
-      <svg class="pipeline-svg" viewBox="0 0 900 330" role="img" aria-labelledby="pipe-title pipe-desc">
-        <title id="pipe-title">PoSafeNet architecture</title>
-        <desc id="pipe-desc">Inputs x and z feed H heads; each head outputs a nominal control which is projected sequentially onto the constraint half-spaces in its linear extension; the safe head outputs are mixed or one is selected.</desc>
-        <defs>
-          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" class="svg-arrowhead"/>
-          </marker>
-        </defs>
-        <!-- input -->
-        <rect x="10" y="125" width="110" height="80" rx="12" class="svg-box svg-input"/>
-        <text x="65" y="160" class="svg-text svg-strong" text-anchor="middle">Inputs</text>
-        <text x="65" y="183" class="svg-text svg-math" text-anchor="middle">x, z</text>
+<div class="method-step">
+<div class="step-num">1</div>
+<div>
+<h3>CBF-induced halfspace projection</h3>
+<p>For a control-affine system, a CBF or HOCBF condition induces an affine inequality in control space:</p>
+<div class="equation">
+$$H_j(x)=\{u\in\mathbb{R}^m:A_j(x)u\geq c_j(x)\}.$$
+</div>
+<p>Projection onto a single halfspace has a closed-form solution:</p>
+<div class="equation">
+$$\Pi_j(u)=u+\frac{\operatorname{ReLU}(c_j-A_ju)}{\|A_j\|^2}A_j^\top.$$
+</div>
+<p>This allows a neural safety layer to apply individual corrections without a differentiable QP solver.</p>
+</div>
+</div>
 
-        <!-- heads -->
-        <g class="svg-head">
-          <rect x="165" y="30" width="120" height="56" rx="10" class="svg-box svg-nom"/>
-          <text x="225" y="55" class="svg-text" text-anchor="middle">Head 1</text>
-          <text x="225" y="74" class="svg-text svg-math" text-anchor="middle">u<tspan dy="5" class="svg-sub">nom</tspan><tspan dy="-12" class="svg-sub">(1)</tspan></text>
-        </g>
-        <g class="svg-head">
-          <rect x="165" y="137" width="120" height="56" rx="10" class="svg-box svg-nom"/>
-          <text x="225" y="162" class="svg-text" text-anchor="middle">Head 2</text>
-          <text x="225" y="181" class="svg-text svg-math" text-anchor="middle">u<tspan dy="5" class="svg-sub">nom</tspan><tspan dy="-12" class="svg-sub">(2)</tspan></text>
-        </g>
-        <text x="225" y="226" class="svg-text svg-muted" text-anchor="middle">&#8942;</text>
-        <g class="svg-head">
-          <rect x="165" y="244" width="120" height="56" rx="10" class="svg-box svg-nom"/>
-          <text x="225" y="269" class="svg-text" text-anchor="middle">Head H</text>
-          <text x="225" y="288" class="svg-text svg-math" text-anchor="middle">u<tspan dy="5" class="svg-sub">nom</tspan><tspan dy="-12" class="svg-sub">(H)</tspan></text>
-        </g>
-        <path d="M120 165 C140 165,140 58,163 58" class="svg-edge" marker-end="url(#arrow)"/>
-        <path d="M120 165 L163 165" class="svg-edge" marker-end="url(#arrow)"/>
-        <path d="M120 165 C140 165,140 272,163 272" class="svg-edge" marker-end="url(#arrow)"/>
+<div class="method-step">
+<div class="step-num">2</div>
+<div>
+<h3>Sequential safety projection</h3>
+<p>For a constraint order \(\sigma=(j_1,\ldots,j_N)\), apply the projection operators sequentially:</p>
+<div class="equation">
+$$u^{(0)}=u_{\mathrm{nom}},\quad u^{(k)}=\Pi_{j_k}(u^{(k-1)}),\quad u_\sigma=u^{(N)}.$$
+</div>
+<p>Later projections can override earlier corrections. Therefore, the sequence determines the effective safety priority.</p>
+</div>
+</div>
 
-        <!-- projection chains -->
-        <g>
-          <rect x="315" y="36" width="76" height="44" rx="8" class="svg-box svg-proj"/><text x="353" y="63" class="svg-text svg-math" text-anchor="middle">Π<tspan dy="5" class="svg-sub">a</tspan></text>
-          <rect x="411" y="36" width="76" height="44" rx="8" class="svg-box svg-proj"/><text x="449" y="63" class="svg-text svg-math" text-anchor="middle">Π<tspan dy="5" class="svg-sub">b</tspan></text>
-          <rect x="507" y="36" width="76" height="44" rx="8" class="svg-box svg-proj"/><text x="545" y="63" class="svg-text svg-math" text-anchor="middle">Π<tspan dy="5" class="svg-sub">c</tspan></text>
-          <path d="M285 58 L313 58" class="svg-edge" marker-end="url(#arrow)"/>
-          <path d="M391 58 L409 58" class="svg-edge" marker-end="url(#arrow)"/>
-          <path d="M487 58 L505 58" class="svg-edge" marker-end="url(#arrow)"/>
-        </g>
-        <g>
-          <rect x="315" y="143" width="76" height="44" rx="8" class="svg-box svg-proj"/><text x="353" y="170" class="svg-text svg-math" text-anchor="middle">Π<tspan dy="5" class="svg-sub">b</tspan></text>
-          <rect x="411" y="143" width="76" height="44" rx="8" class="svg-box svg-proj"/><text x="449" y="170" class="svg-text svg-math" text-anchor="middle">Π<tspan dy="5" class="svg-sub">a</tspan></text>
-          <rect x="507" y="143" width="76" height="44" rx="8" class="svg-box svg-proj"/><text x="545" y="170" class="svg-text svg-math" text-anchor="middle">Π<tspan dy="5" class="svg-sub">c</tspan></text>
-          <path d="M285 165 L313 165" class="svg-edge" marker-end="url(#arrow)"/>
-          <path d="M391 165 L409 165" class="svg-edge" marker-end="url(#arrow)"/>
-          <path d="M487 165 L505 165" class="svg-edge" marker-end="url(#arrow)"/>
-        </g>
-        <g>
-          <rect x="315" y="250" width="76" height="44" rx="8" class="svg-box svg-proj"/><text x="353" y="277" class="svg-text svg-math" text-anchor="middle">Π<tspan dy="5" class="svg-sub">·</tspan></text>
-          <rect x="411" y="250" width="76" height="44" rx="8" class="svg-box svg-proj"/><text x="449" y="277" class="svg-text svg-math" text-anchor="middle">Π<tspan dy="5" class="svg-sub">·</tspan></text>
-          <rect x="507" y="250" width="76" height="44" rx="8" class="svg-box svg-proj"/><text x="545" y="277" class="svg-text svg-math" text-anchor="middle">Π<tspan dy="5" class="svg-sub">·</tspan></text>
-          <path d="M285 272 L313 272" class="svg-edge" marker-end="url(#arrow)"/>
-          <path d="M391 272 L409 272" class="svg-edge" marker-end="url(#arrow)"/>
-          <path d="M487 272 L505 272" class="svg-edge" marker-end="url(#arrow)"/>
-        </g>
-        <text x="449" y="20" class="svg-text svg-muted svg-small" text-anchor="middle">sequential projection along a linear extension σ<tspan dy="-6" class="svg-sub">(h)</tspan><tspan dy="6"> of the safety poset</tspan></text>
+<div class="method-step">
+<div class="step-num">3</div>
+<div>
+<h3>Poset-structured safety composition</h3>
+<p>
+Let \((\mathcal S,\preceq)\) be a safety poset. The relation \(i\prec j\) means that constraint \(j\) has strictly higher priority than constraint \(i\). A linear extension places \(i\) before \(j\).
+</p>
+<div class="theorem">
+<h4>Proposition 4.1 — Poset consistency</h4>
+<p>Sequential projection along any linear extension respects the poset's admissible override semantics. An earlier constraint may be overridden by a later higher-priority or incomparable constraint, but not by a strictly lower-priority comparable constraint.</p>
+</div>
+<div class="theorem">
+<h4>Theorem 4.2 — Hard head selection</h4>
+<p>Selecting any individual head associated with a valid linear extension produces a poset-respecting safety execution without additional assumptions on the nominal policy.</p>
+</div>
+<div class="theorem">
+<h4>Proposition 4.3 — Conditional mixture safety</h4>
+<p>A convex mixture preserves a halfspace when every participating head output satisfies that halfspace. Broader safety preservation requires additional non-interference or compatibility conditions.</p>
+</div>
+<div class="note">
+<strong>Scope of the guarantee.</strong>
+Poset-respecting safety is not equivalent to simultaneous satisfaction of all constraints. A later projection may invalidate an earlier one. Forward invariance requires the corresponding final CBF inequalities to hold along the trajectory.
+</div>
+</div>
+</div>
 
-        <!-- combine -->
-        <path d="M583 58 C620 58,620 150,660 160" class="svg-edge" marker-end="url(#arrow)"/>
-        <path d="M583 165 L658 165" class="svg-edge" marker-end="url(#arrow)"/>
-        <path d="M583 272 C620 272,620 180,660 170" class="svg-edge" marker-end="url(#arrow)"/>
-        <rect x="660" y="115" width="130" height="100" rx="12" class="svg-box svg-combine"/>
-        <text x="725" y="150" class="svg-text svg-strong" text-anchor="middle">Mix / Select</text>
-        <text x="725" y="173" class="svg-text svg-small" text-anchor="middle">convex mixture α</text>
-        <text x="725" y="193" class="svg-text svg-small" text-anchor="middle">or Gumbel-softmax</text>
-        <path d="M790 165 L838 165" class="svg-edge" marker-end="url(#arrow)"/>
-        <circle cx="862" cy="165" r="24" class="svg-box svg-output"/>
-        <text x="862" y="171" class="svg-text svg-math svg-strong" text-anchor="middle">u</text>
-      </svg>
-      </div>
-      <figcaption>
-        <strong>Architecture (schematic of Algorithm 1).</strong> A multi-head network produces nominal controls
-        \(\mathbf{u}^{(h)}_{\mathrm{nom}}\); each head projects its control sequentially onto the constraint
-        half-spaces following a fixed linear extension \(\sigma^{(h)}\) of the safety poset (different heads use
-        different admissible orders). The safe head outputs are then combined by a convex mixture or by
-        (Gumbel-softmax) hard selection.
-      </figcaption>
-    </figure>
+<div class="method-step">
+<div class="step-num">4</div>
+<div>
+<h3>Multi-head architecture and learning</h3>
+<p>Each head predicts a nominal control and applies sequential projection according to its associated linear extension:</p>
+<div class="equation">
+$$u^{(h)}=\Pi_{\sigma^{(h)}}(u_{\mathrm{nom}}^{(h)}).$$
+</div>
+<p>Head outputs are combined through a learned convex mixture or hard selection:</p>
+<div class="equation">
+$$u_{\mathrm{mix}}=\sum_{h=1}^{H}\alpha_hu^{(h)},\quad
+\alpha_h\geq0,\quad\sum_h\alpha_h=1.$$
+</div>
+<p>
+Hard selection uses Gumbel-softmax relaxation for differentiable training and deterministic head selection during inference. CBF gains are learned jointly with the nominal policy. Gradients propagate through the closed-form projection operators.
+</p>
+</div>
+</div>
 
-    <div class="method-step">
-      <div class="step-index">1</div>
-      <div class="step-body">
-        <h3>Safety constraints as half-space projections</h3>
-        <p>
-          For control-affine systems \(\dot{\mathbf{x}} = f(\mathbf{x}) + g(\mathbf{x})\mathbf{u}\), enforcing a
-          safety constraint \(b_j(\mathbf{x}) \ge 0\) (e.g. via a control barrier function) induces an affine
-          condition on the control input, i.e. a half-space:
-        </p>
-        <div class="equation">$$H_j(\mathbf{x}) := \big\{\,\mathbf{u}\in\mathbb{R}^m \;\big|\; A_j(\mathbf{x})\,\mathbf{u} \ge c_j(\mathbf{x})\,\big\}.$$</div>
-        <p>Projecting a control onto this half-space,
-          \(\Pi_j(\mathbf{u}) = \arg\min_{\mathbf{v}} \|\mathbf{v}-\mathbf{u}\|^2\ \text{s.t.}\ A_j(\mathbf{x})\mathbf{v} \ge c_j(\mathbf{x})\),
-          admits a closed-form solution:</p>
-        <div class="equation highlight-eq">$$\Pi_j(\mathbf{u}) = \mathbf{u} + \frac{\mathrm{ReLU}\big(c_j(\mathbf{x}) - A_j(\mathbf{x})\,\mathbf{u}\big)}{\|A_j(\mathbf{x})\|^2}\, A_j(\mathbf{x})^{\top}.$$</div>
-        <p>
-          If the constraint is already satisfied, \(\Pi_j(\mathbf{u}) = \mathbf{u}\); otherwise the ReLU term applies the
-          minimal correction that restores feasibility. Each constraint thus acts as an <em>operator</em> on the control
-          input rather than as a penalty in the loss.
-          <span class="aside-note"><strong>Learnable tightness.</strong> For a CBF condition
-          \(\dot b_j(\mathbf{x},\mathbf{u}) \ge -\kappa_j\, b_j(\mathbf{x})\), the gain \(\kappa_j\) is learned jointly with
-          the policy, adjusting how conservative each constraint is while preserving the half-space structure for any
-          \(\kappa_j \ge 0\).</span>
-        </p>
-      </div>
-    </div>
-
-    <div class="method-step">
-      <div class="step-index">2</div>
-      <div class="step-body">
-        <h3>Sequential safety projection</h3>
-        <p>Multiple constraints are composed by applying their projection operators one after another along an
-          ordering \(\sigma = (j_1,\dots,j_N)\):</p>
-        <div class="equation">$$\begin{gathered} \mathbf{u}^{(0)} = \mathbf{u}_{\mathrm{nom}}, \qquad \mathbf{u}^{(k)} = \Pi_{j_k}\!\big(\mathbf{u}^{(k-1)}\big),\quad k = 1,\dots,N, \\ \mathbf{u}_\sigma = \mathbf{u}^{(N)}. \end{gathered}$$</div>
-        <p>Different orders can yield different actions from the same nominal input &mdash; which is exactly why a
-          principled structure over admissible orders is needed.</p>
-      </div>
-    </div>
-
-    <div class="method-step">
-      <div class="step-index">3</div>
-      <div class="step-body">
-        <h3>Poset-structured safety composition</h3>
-        <p>
-          Constraints \(\mathcal{S}=\{1,\dots,N\}\) carry a partial order \(\preceq\), where \(i \prec j\) means
-          constraint \(j\) has strictly higher priority than \(i\). A total order \(\sigma\) is a <em>linear extension</em>
-          of \((\mathcal{S},\preceq)\) if \(i \prec j\) implies that \(i\) appears before \(j\) in \(\sigma\) &mdash;
-          so a higher-priority constraint is always enforced later and can override a lower-priority one, never the reverse.
-        </p>
-        <figure class="media-slot figure-card figure-narrow"
-                data-kind="image"
-                data-src="static/images/linear_extensions.png"
-                data-label="Poset and its linear extensions"
-                data-hint="Figures/Linear_Extensions.pdf">
-          <figcaption>
-            <strong>From a poset to admissible orders.</strong> (a) A safety poset over four constraints
-            \(c_1,\dots,c_4\), drawn as a Hasse diagram. (b) Its three linear extensions &mdash; total orders consistent with
-            the poset, each defining one admissible sequential safety execution.
-          </figcaption>
-        </figure>
-        <div class="theorem-box">
-          <div class="theorem-title">Definition (Poset-respecting safety)</div>
-          <p>A policy satisfies poset-respecting safety if safety is enforced according to some linear extension of
-            \(\preceq\), such that a constraint \(i\) may be violated only when enforcing a constraint \(j\) with strictly
-            higher priority, \(i \prec j\).</p>
-        </div>
-        <div class="theorem-box">
-          <div class="theorem-title">Corollary (Poset consistency of linear extensions)</div>
-          <p>For any linear extension \(\sigma\) of the safety poset, sequential enforcement along \(\sigma\) satisfies
-            poset-respecting safety.</p>
-        </div>
-        <div class="theorem-box">
-          <div class="theorem-title">Theorem (Sequential projection and antichain mixing)</div>
-          <p>If a policy enforces constraints by sequential projection along linear extensions of the poset and combines
-            executions only through permutations within antichains, and if projecting onto one of two incomparable
-            constraints does not violate feasibility of the other, then the policy satisfies poset-respecting safety.
-            Geometrically, the half-spaces of incomparable constraints must intersect robustly, avoiding acute corners.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="method-step">
-      <div class="step-index">4</div>
-      <div class="step-body">
-        <h3>Multi-head architecture, head combination, and training</h3>
-        <p>PoSafeNet produces \(H\) nominal controls, each tied to a fixed linear extension \(\sigma^{(h)}\):
-          \(\mathbf{u}^{(h)} = \Pi_{\sigma^{(h)}}\big(\mathbf{u}^{(h)}_{\mathrm{nom}}\big)\).
-          During training the heads are combined by a convex mixture with global coefficients,</p>
-        <div class="equation">$$\mathbf{u} = \sum_{h=1}^{H} \alpha_h\, \mathbf{u}^{(h)}, \qquad \alpha_h \ge 0,\ \ \sum_h \alpha_h = 1,$$</div>
-        <p>or, alternatively, a single head is sampled differentiably with Gumbel-softmax. At inference a single head is
-          selected or a fixed mixture is applied. The model is trained by imitation learning,
-          \(\mathcal{L}(\boldsymbol{\theta}) = \mathbb{E}_{(\mathbf{x},\mathbf{z},\mathbf{u}^*)\sim\mathcal{D}}
-          \big[\ell(\mathbf{u}^*, \mathbf{u}(\mathbf{x},\mathbf{z};\boldsymbol{\theta}))\big]\), with gradients flowing
-          through the closed-form projections.</p>
-        <div class="callout">
-          <strong>Safety remark.</strong> Hard head selection is always safe, since it executes one poset-consistent
-          linear extension. Convex mixtures preserve safety only under additional geometric assumptions (all heads in a
-          common intersection of half-spaces, or mutually non-conflicting incomparable constraints); otherwise the mixture
-          is an empirical performance heuristic. The navigation and manipulation tasks satisfy the sufficient conditions;
-          for vision-based driving, safety should be interpreted as empirical.
-        </div>
-      </div>
-    </div>
-
-    <details class="algo-box">
-      <summary>Algorithm 1 &mdash; Construction and training of PoSafeNet</summary>
-      <ol class="algo-list">
-        <li><strong>Input:</strong> dynamics \(\dot{\mathbf{x}} = f(\mathbf{x}) + g(\mathbf{x})\mathbf{u}\); CBF constraints \(\{b_i(\mathbf{x})\ge 0\}_{i\in\mathcal{S}}\) with poset \((\mathcal{S},\preceq)\); linear extensions \(\{\sigma^{(h)}\}_{h=1}^{H}\).</li>
-        <li>Initialize nominal policies \(\{\mathbf{u}^{(h)}_{\mathrm{nom}}\}_{h=1}^{H}\).</li>
-        <li>Initialize mixture weights \(\boldsymbol{\alpha}\) or Gumbel logits \(\boldsymbol{\gamma}\).</li>
-        <li>Construct control-feasible half-spaces \(H_i(\mathbf{x})\) and projection operators \(\Pi_i\).</li>
-        <li><strong>for</strong> \(h = 1,\dots,H\): \(\ \mathbf{u}^{(h)} \leftarrow \mathbf{u}^{(h)}_{\mathrm{nom}}(\mathbf{x},\mathbf{z})\); <strong>for</strong> \(j \in \sigma^{(h)}\): \(\ \mathbf{u}^{(h)} \leftarrow \Pi_j(\mathbf{u}^{(h)};\mathbf{x})\).</li>
-        <li>Select or mix \(\{\mathbf{u}^{(h)}\}\) using \(\boldsymbol{\alpha}\) or Gumbel-softmax to obtain \(\mathbf{u}(\mathbf{x},\mathbf{z})\).</li>
-      </ol>
-    </details>
-  </div>
+</div>
 </section>
 
-<!-- ============ Results ============ -->
 <section class="section" id="results">
-  <div class="container is-max-desktop">
-    <h2 class="section-title">Experimental Results</h2>
-    <p class="lead">
-      PoSafeNet is compared against an end-to-end network (E2E) and unstructured safety layers &mdash; BarrierNet,
-      ABNet, and DFBNet &mdash; which flatten all constraints into a single layer or introduce slack variables.
-      Here we highlight the vision-based end-to-end driving experiment; results on 2D multi-obstacle navigation and
-      constrained robot manipulation are reported in the <a href="https://arxiv.org/abs/2601.22356" target="_blank" rel="noopener">paper</a>.
-    </p>
+<div class="container">
+<h2>Experimental Results</h2>
+<p class="lead">
+PoSafeNet is evaluated on three simulation benchmarks: multi-obstacle navigation, constrained two-link manipulation, and VISTA autonomous driving.
+</p>
 
-
-    <div class="highlight-grid">
-      <div class="highlight-card">
-        <div class="highlight-task">VISTA driving</div>
-        <div class="highlight-value">100%</div>
-        <div class="highlight-desc">pass rate (rollouts completed without collision) for both PoSafeNet variants</div>
-      </div>
-      <div class="highlight-card">
-        <div class="highlight-task">VISTA driving</div>
-        <div class="highlight-value">0%</div>
-        <div class="highlight-desc">crash rate for both PoSafeNet variants</div>
-      </div>
-      <div class="highlight-card">
-        <div class="highlight-task">VISTA driving</div>
-        <div class="highlight-value">1.23 / 2.73</div>
-        <div class="highlight-desc">minimum safety barrier value (Mixture / Hard) &mdash; positive, i.e. no obstacle-safety violation</div>
-      </div>
-    </div>
-
-    <!-- ---------- Efficiency ---------- -->
-    <h3 class="subsection-title">Computation and training time</h3>
-    <p>
-      Timing is measured with three simultaneously active CBF constraints. ABNet is evaluated with its dQP
-      (<code>qpth</code>) implementation, since its closed form does not generalize to three constraints.
-      PoSafeNet's cost is comparable to standard neural networks up to a small constant factor, scales near-linearly in
-      the number of heads, and is significantly faster than QP-based safety layers.
-    </p>
-    <div class="columns is-variable is-4">
-      <div class="column">
-        <figure class="media-slot figure-card"
-                data-kind="image"
-                data-src="static/images/batch_time.png"
-                data-label="Inference time vs. batch size"
-                data-hint="Paper Fig. 3a (Figures/Batchtime.pdf)">
-          <figcaption>Inference (forward-only) time versus batch size with \(H=10\) (log scale).</figcaption>
-        </figure>
-      </div>
-      <div class="column">
-        <figure class="media-slot figure-card"
-                data-kind="image"
-                data-src="static/images/head_time.png"
-                data-label="Training time vs. number of heads"
-                data-hint="Paper Fig. 3b (Figures/Headtime.pdf)">
-          <figcaption>Training time per step versus number of heads with \(B=128\) (log scale).</figcaption>
-        </figure>
-      </div>
-    </div>
-
-    <p class="protocol-note">
-      <strong>Protocol.</strong> Safety (min / mean) is the minimum and average task-specific barrier value over a
-      rollout (negative = violation). Values are normalized per task and comparable only within each table.
-      All methods use identical settings and training protocols. Rows for PoSafeNet are highlighted.
-    </p>
-
-    <!-- ---------- Experiment 3 ---------- -->
-    <div class="experiment-block">
-      <h3 class="subsection-title"><span class="exp-tag">VISTA</span> Vision-based end-to-end autonomous driving</h3>
-      <p>
-        Policies map raw camera images to controls in the <code>VISTA</code> data-driven simulator. Safety constraints include
-        collision avoidance and lane keeping; collision avoidance takes precedence, so lane keeping may be temporarily
-        violated to preserve higher-priority safety. BarrierNet and ABNet are also reported without lane constraints for
-        comparability. Results on the held-out test set.
-      </p>
-      <figure class="media-slot figure-card figure-narrow"
-              data-kind="image"
-              data-src="static/images/driving_posets.png"
-              data-label="Driving safety posets"
-              data-hint="Figures/Task_Hasse_2_v2.pdf">
-        <figcaption>
-          <strong>Task-specific safety posets used in the vision-based driving experiments, visualized as Hasse diagrams.</strong>
-          Left: a two-level hierarchy where obstacle avoidance has higher priority than left and right lane boundary constraints.
-          Right: a four-level hierarchy that augments the two-level structure with intermediate speed regulation and
-          low-priority centerline adherence, while preserving obstacle avoidance as the highest-priority constraint.
-        </figcaption>
-      </figure>
-      <div class="table-wrap">
-        <table class="results-table">
-          <thead>
-            <tr>
-              <th>Method</th><th>Pass% ↑</th><th>Crash% ↓</th><th>Safety (min / mean)</th><th>Lane viol. (min / mean)</th>
-              <th>|e<sub>y</sub>| (mean / var) ↓</th><th>Time-out-of-lane ↓</th><th>Rot viol. ↓</th><th>Unc. (u1, u2)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>E2E</td><td>15.0</td><td>85.0</td><td>−33.63 / −22.39</td><td>−1.90 / 0.87</td><td>0.396 / 0.330</td><td>0.0187</td><td>0.07</td><td>(0.134, 0.413)</td></tr>
-            <tr><td>DFBNet (w/ lane constraint)</td><td>100.0</td><td>0.0</td><td>12.36 / 19.07</td><td>−2.62 / −1.57</td><td>1.509 / 2.745</td><td>0.3769</td><td>0.52</td><td>(0.290, 0.542)</td></tr>
-            <tr><td>DFBNet (w/o lane constraint)</td><td>100.0</td><td>0.0</td><td>13.11 / 19.73</td><td>−2.78 / −1.65</td><td>1.514 / 2.871</td><td>0.3786</td><td>0.61</td><td>(0.288, 0.548)</td></tr>
-            <tr><td>BarrierNet (w/ lane constraint)</td><td>0.0</td><td>100.0</td><td>−44.87 / −31.76</td><td>0.07 / 0.09</td><td>0.939 / 0.607</td><td>0.0000</td><td>0.00</td><td>(0.038, 0.406)</td></tr>
-            <tr><td>BarrierNet (w/o lane constraint)</td><td>100.0</td><td>0.0</td><td>−0.17 / 5.82</td><td>−4.23 / −1.57</td><td>1.364 / 2.522</td><td>0.2886</td><td>0.73</td><td>(0.384, 0.558)</td></tr>
-            <tr><td>ABNet (w/ lane constraint)</td><td>25.0</td><td>75.0</td><td>−46.16 / −23.60</td><td>−0.03 / 0.18</td><td>1.174 / 0.433</td><td>0.0662</td><td>0.00</td><td>(0.099, 0.651)</td></tr>
-            <tr><td>ABNet (w/o lane constraint)</td><td>100.0</td><td>0.0</td><td>5.65 / 8.33</td><td>−2.24 / −1.17</td><td>1.232 / 2.154</td><td>0.3141</td><td>0.80</td><td>(0.401, 0.423)</td></tr>
-            <tr class="ours"><td>PoSafeNet (Mixture)</td><td>100.0</td><td>0.0</td><td>1.23 / 8.21</td><td>−0.93 / −0.49</td><td>1.028 / 1.278</td><td>0.1992</td><td>0.14</td><td>(0.287, 0.387)</td></tr>
-            <tr class="ours"><td>PoSafeNet (Hard)</td><td>100.0</td><td>0.0</td><td>2.73 / 7.12</td><td>−0.63 / −0.32</td><td>1.404 / 1.599</td><td>0.3670</td><td>0.80</td><td>(0.345, 0.456)</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="table-note">Lane viol. reports lane margin (negative = departure); |e<sub>y</sub>| is lateral deviation from the lane
-        centerline; Pass% counts rollouts completed without collision; Rot viol. is the mean rotation-rate magnitude.
-        PoSafeNet trades a slight increase in mean deviation for consistent adherence to safety priorities; the mixture
-        steers more smoothly with lower lane violation and control variance, while the hard variant commits to one side
-        of the lane.</p>
-
-      <figure class="media-slot figure-card"
-              data-kind="image"
-              data-src="static/images/exp3_traj.png"
-              data-label="Driving trajectories"
-              data-hint="Paper Fig. 6 (Figures/Experiment3_traj2.pdf)">
-        <figcaption>Representative closed-loop driving trajectories in VISTA. Unstructured baselines exhibit unstable
-          behavior near obstacles or lane departures; PoSafeNet maintains collision avoidance and lane adherence,
-          consistent with the priority of collision avoidance over lane keeping.</figcaption>
-      </figure>
-
-      <figure class="media-slot figure-card"
-              data-kind="video"
-              data-src="static/videos/video_posafenet_mix_4layer.mp4"
-              data-label="VISTA rollout: PoSafeNet (Mixture)"
-              data-hint="state readout + front camera + top-down view">
-        <figcaption>Closed-loop VISTA rollout, PoSafeNet (Mixture). Left: vehicle state and predicted controls;
-          center: front camera with the planned path (blue) and detected obstacle (red box); right: top-down view.</figcaption>
-      </figure>
-
-      <figure class="media-slot figure-card"
-              data-kind="video"
-              data-src="static/videos/video_posafenet_hard_4layer.mp4"
-              data-label="VISTA rollout: PoSafeNet (Hard)"
-              data-hint="state readout + front camera + top-down view">
-        <figcaption>Closed-loop VISTA rollout, PoSafeNet (Hard).</figcaption>
-      </figure>
-    </div>
+<div class="stats">
+  <div class="stat">
+    <div class="label">VISTA · Two-layer Mixture</div>
+    <div class="value">68.78</div>
+    <div class="label">Progress ± 5.66</div>
   </div>
+  <div class="stat">
+    <div class="label">VISTA · Four-layer Mixture</div>
+    <div class="value">0.001</div>
+    <div class="label">Time ratio out-of-lane ± 0.003</div>
+  </div>
+  <div class="stat">
+    <div class="label">VISTA · Both PoSafeNet variants</div>
+    <div class="value">0.00</div>
+    <div class="label">Mean crash rate across evaluated seeds</div>
+  </div>
+</div>
+
+<article class="experiment">
+<div class="tag">EXPERIMENT 1 · TABLE 2</div>
+<h3>Multi-obstacle navigation</h3>
+<p>
+A unicycle navigates around three mutually incomparable circular obstacles under stochastic perturbations.
+</p>
+<figure class="figure">
+<img src="static/images/experiment12_traj.png" alt="Navigation and manipulation trajectories">
+<figcaption>Figure 2. Representative trajectories for navigation and manipulation.</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+<thead><tr>
+<th>Method</th>
+<th>Op. Feas.% ↑</th>
+<th>Obstacle Safety (min)</th>
+<th>Top Safety</th>
+<th>FinalDist ↓</th>
+<th>Rollout Time (s) ↓</th>
+</tr></thead>
+<tbody id="navigation-data"></tbody>
+</table>
+</div>
+<p class="table-note">
+Operational feasibility measures the availability of a valid safety-layer output, not the probability of completing the task without collisions. The source evaluates 24 test episodes and 100 stochastic rollouts.
+</p>
+</article>
+
+<article class="experiment">
+<div class="tag">EXPERIMENT 2 · TABLE 3</div>
+<h3>Safe manipulation under joint constraints</h3>
+<p>A two-link manipulator tracks a reference trajectory while respecting higher-priority joint safety constraints.</p>
+<div class="table-wrap">
+<table>
+<thead><tr>
+<th>Method</th>
+<th>Op. Feas.% ↑</th>
+<th>φ-violation (max) ↓</th>
+<th>Top Safety</th>
+<th>Obstacle Safety (min) ↑</th>
+<th>FinalDist ↓</th>
+<th>Rollout Time (s) ↓</th>
+</tr></thead>
+<tbody id="manipulation-data"></tbody>
+</table>
+</div>
+<p class="table-note">
+Both PoSafeNet variants achieve zero joint-limit violation and 100% operational feasibility in the reported benchmark. Mixture achieves lower final distance, while Hard has lower rollout time.
+</p>
+</article>
+
+<article class="experiment">
+<div class="tag">EXPERIMENT 3 · TABLE 4</div>
+<h3>Vision-based end-to-end autonomous driving</h3>
+<p>
+In VISTA, the nominal policy maps RGB camera images to controls. The CBF safety layer, however, uses simulator ground-truth state, obstacle positions, and lane geometry.
+</p>
+<p>
+The driving experiment evaluates a two-layer hierarchy and a four-layer hierarchy. Values are <strong>mean ± standard deviation over four seeds {0, 1, 2, 42}</strong>.
+</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr>
+<th>Method</th>
+<th>Obstacle Safety (min) ≥ 0</th>
+<th>Crash ↓</th>
+<th>Lane Margin (min) ↑</th>
+<th>Time Ratio Out-of-Lane ↓</th>
+<th>Progress ↑</th>
+<th>|e<sub>y</sub>| (mean) ↓</th>
+</tr></thead>
+<tbody id="vista-data"></tbody>
+</table>
+</div>
+
+<p class="table-note">
+Crash is reported as a fraction, not a percentage. A negative barrier margin indicates a constraint violation. The zero-crash outcome does not by itself imply a nonnegative barrier margin.
+</p>
+
+<figure class="figure">
+<img src="static/images/exp3_traj.png" alt="VISTA closed-loop trajectories">
+<figcaption>
+Figure 3. Representative VISTA closed-loop trajectories from the latest manuscript.
+</figcaption>
+</figure>
+
+<h4>Safety–performance trade-off</h4>
+<p>
+In the two-layer setting, PoSafeNet Mixture achieves progress of 68.78 ± 5.66 with an out-of-lane time ratio of 0.062 ± 0.038.
+</p>
+<p>
+In the four-layer setting, Mixture reduces this ratio to 0.001 ± 0.003 and decreases mean lateral deviation to 0.47 ± 0.02, while mean progress becomes 61.61 ± 0.17.
+</p>
+<p>
+Hard selection yields higher mean progress in both settings, but also higher time-out-of-lane ratios. These aggregate results illustrate a trade-off and do not establish statistically reliable cross-seed superiority among all PoSafeNet configurations.
+</p>
+
+<div class="videos">
+<div>
+<h4>PoSafeNet Mixture · Four-layer</h4>
+<video controls preload="none">
+<source src="static/videos/video_posafenet_mix_4layer.mp4" type="video/mp4">
+</video>
+</div>
+<div>
+<h4>PoSafeNet Hard · Four-layer</h4>
+<video controls preload="none">
+<source src="static/videos/video_posafenet_hard_4layer.mp4" type="video/mp4">
+</video>
+</div>
+</div>
+</article>
+
+<article class="experiment">
+<div class="tag">APPENDIX A · FIGURE 4</div>
+<h3>Computational efficiency</h3>
+<p>
+PoSafeNet avoids a differentiable QP solver. With three active CBF constraints, the benchmarks show lower computation overhead than the evaluated ABNet QP implementation.
+</p>
+<div class="figure-grid">
+<figure class="figure">
+<img src="static/images/batch_time.png" alt="Inference time">
+<figcaption>Inference time versus batch size, H = 10.</figcaption>
+</figure>
+<figure class="figure">
+<img src="static/images/head_time.png" alt="Training time">
+<figcaption>Training time per step versus instantiated head count, B = 128.</figcaption>
+</figure>
+</div>
+<p class="table-note">
+The benchmark studies scaling in instantiated heads, not the number of distinct linear extensions or the size of the safety poset.
+</p>
+</article>
+
+</div>
 </section>
 
-<!-- ============ Citation ============ -->
-<section class="section section-alt" id="citation">
-  <div class="container is-max-desktop">
-    <div class="bibtex-header">
-      <h2 class="section-title">Citation</h2>
-      <button class="copy-bibtex-btn" type="button" aria-label="Copy BibTeX to clipboard">
-        <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <span class="copy-text">Copy</span>
-      </button>
-    </div>
-    <!-- TODO(authors): switch to the NeurIPS 2026 @inproceedings entry once the proceedings BibTeX is available -->
-    <pre id="bibtex-code"><code>@article{wong2026posafenet,
-  title   = {PoSafeNet: Safe Learning with Poset-Structured Neural Nets},
-  author  = {Wong, Kiwan and Xiao, Wei and Rus, Daniela},
-  journal = {arXiv preprint arXiv:2601.22356},
-  year    = {2026}
-}</code></pre>
-  </div>
+<section class="section alt" id="limitations">
+<div class="container narrow">
+<h2>Limitations &amp; Guarantees</h2>
+<ul>
+<li><strong>Sequential projection:</strong> A later constraint may invalidate an earlier constraint. Poset consistency alone does not guarantee simultaneous feasibility.</li>
+<li><strong>Convex mixture:</strong> Safety preservation requires compatibility or non-interference conditions.</li>
+<li><strong>Perception:</strong> VISTA uses simulator ground-truth state for the CBF layer, so fully vision-only safety is not established.</li>
+<li><strong>Manual specification:</strong> CBFs and poset relations are designer-defined, not automatically discovered.</li>
+<li><strong>Validation:</strong> Experiments are simulation-based; physical robot validation is not reported.</li>
+</ul>
+</div>
 </section>
 
-</main>
+<section class="section" id="citation">
+<div class="container narrow">
+<h2>Citation</h2>
+<p>Provisional citation; update after the official NeurIPS proceedings BibTeX becomes available.</p>
+<button class="copy" onclick="copyBib()">Copy BibTeX</button>
+<pre id="bibtex">@inproceedings{wong2026posafenet,
+  title={PoSafeNet: Structured Safety Learning via Compositional Projection},
+  author={Wong, Kiwan and Xiao, Wei and Rus, Daniela},
+  booktitle={Advances in Neural Information Processing Systems},
+  year={2026}
+}</pre>
+</div>
+</section>
 
-<footer class="footer site-footer">
-  <div class="container is-max-desktop has-text-centered">
-    <p>
-      This page was built using the <a href="https://github.com/WBK-Robotics/paper_website_template" target="_blank" rel="noopener">Academic Project Page Template</a>,
-      adapted from the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank" rel="noopener">Academic Project Page Template</a>
-      by Eliahu Horwitz, which was adopted from the <a href="https://nerfies.github.io" target="_blank" rel="noopener">Nerfies</a> project page.
-      This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
-    </p>
-  </div>
+<footer class="footer">
+<div class="container">
+<p>PoSafeNet · NeurIPS 2026 · MIT CSAIL</p>
+<p>Academic project page. Figures and experimental results follow the latest supplied NeurIPS 2026 manuscript.</p>
+</div>
 </footer>
 
-<button class="scroll-to-top" type="button" aria-label="Scroll to top">
-  <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-</button>
+<script>
+// EDIT THE DATA BELOW TO CHANGE THE WEBSITE TABLES.
+// The "|" character separates table columns.
+// A row beginning with "#" is a full-width group heading.
+
+const navigation = `
+E2E [11]|N/A|−81.00|×|26.57|0.028
+DFBNet (slack = 0) [13]|78|−80.78|×|19.43|5.52
+DFBNet (slack = 10³) [13]|100|0.144|✓|15.40|6.57
+BarrierNet (slack = 0) [18]|44|−43.99|×|7.81|7.09
+BarrierNet (slack = 10³) [18]|83|0.00|✓|14.05|7.54
+ABNet (slack = 0) [19]|35|−61.28|×|13.14|36.37
+PoSafeNet (Mixture)|100|1.63|✓|12.41|1.51
+PoSafeNet (Hard)|100|0.00|✓|10.95|0.276
+`;
+
+const manipulation = `
+E2E [11]|N/A|1.98 × 10⁻¹|×|−12.04|0.702|0.021
+DFBNet (slack = 0) [13]|100|3.26 × 10⁻¹|×|−14.99|2.53|1.62
+DFBNet (slack = 10³) [13]|100|4.56 × 10⁻⁵|×|−14.84|2.29|1.71
+BarrierNet (slack = 0) [18]|100|2.51 × 10⁻¹|×|−9.63|0.672|1.59
+BarrierNet (slack = 10³) [18]|100|0.00|✓|−4.07|0.410|1.60
+ABNet (slack = 0) [19]|76|0.838|×|−14.35|—|0.550
+ABNet (slack = 10³) [19]|84|0.837|×|31.03|9.48|0.544
+PoSafeNet (Mixture)|100|0.00|✓|0.199|0.361|0.173
+PoSafeNet (Hard)|100|0.00|✓|0.018|0.527|0.095
+`;
+
+// VISTA DATA — Latest NeurIPS PDF, Table 4
+// Four seeds: 0, 1, 2, 42.
+
+const vista = `
+#No structured safety layer
+E2E [3]|−43.59 ± 20.89|0.78 ± 0.05|−1.18 ± 1.13|0.052 ± 0.035|37.00 ± 3.18|0.46 ± 0.10
+#Two-layer: obstacle avoidance ≻ {L lane, R lane}
+DFBNet [13]|−7.98 ± 5.99|0.75 ± 0.50|1.26 ± 0.85|0.000 ± 0.000|31.44 ± 6.16|0.36 ± 0.62
+BarrierNet [18]|−19.26 ± 6.20|0.98 ± 0.05|0.57 ± 0.68|0.000 ± 0.000|42.96 ± 14.84|0.52 ± 0.47
+ABNet [19]|−14.29 ± 3.14|0.83 ± 0.24|0.78 ± 0.50|0.000 ± 0.000|45.76 ± 12.86|0.53 ± 0.27
+HQP [9]|−0.09 ± 0.00|0.00 ± 0.00|0.06 ± 0.00|0.000 ± 0.000|44.85 ± 0.00|1.07 ± 0.00
+PoSafeNet (Hard)|3.37 ± 1.21|0.00 ± 0.00|−0.36 ± 0.19|0.214 ± 0.105|71.39 ± 9.08|1.34 ± 0.08
+PoSafeNet (Mixture)|2.42 ± 1.07|0.00 ± 0.00|−0.16 ± 0.06|0.062 ± 0.038|68.78 ± 5.66|0.99 ± 0.15
+#Four-layer: obstacle ≻ {L lane, R lane} ≻ {speed max, speed min} ≻ centerline
+HQP [9]|0.0002 ± 0.0000|0.00 ± 0.00|1.71 ± 0.00|0.000 ± 0.000|27.14 ± 0.00|0.20 ± 0.00
+PoSafeNet (Hard)|3.51 ± 3.88|0.00 ± 0.00|−0.48 ± 0.60|0.193 ± 0.222|75.82 ± 13.72|0.98 ± 0.45
+PoSafeNet (Mixture)|1.11 ± 0.52|0.00 ± 0.00|−0.01 ± 0.08|0.001 ± 0.003|61.61 ± 0.17|0.47 ± 0.02
+`;
+
+function renderTable(id, source) {
+  const tbody = document.getElementById(id);
+  const count = tbody.closest("table").querySelectorAll("thead th").length;
+
+  source.trim().split("\n").forEach(line => {
+    const tr = document.createElement("tr");
+
+    if (line.startsWith("#")) {
+      tr.className = "group";
+      const td = document.createElement("td");
+      td.colSpan = count;
+      td.textContent = line.slice(1);
+      tr.appendChild(td);
+    } else {
+      const cells = line.split("|");
+      if (cells[0].includes("PoSafeNet")) tr.className = "ours";
+      cells.forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value.trim();
+        tr.appendChild(td);
+      });
+    }
+    tbody.appendChild(tr);
+  });
+}
+
+renderTable("navigation-data", navigation);
+renderTable("manipulation-data", manipulation);
+renderTable("vista-data", vista);
+
+function copyBib() {
+  navigator.clipboard.writeText(
+    document.getElementById("bibtex").textContent
+  ).then(() => {
+    const btn = document.querySelector(".copy");
+    btn.textContent = "Copied!";
+    setTimeout(() => btn.textContent = "Copy BibTeX", 1800);
+  });
+}
+
+window.addEventListener("load", () => {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left:"$$",right:"$$",display:true},
+        {left:"\\(",right:"\\)",display:false}
+      ],
+      throwOnError:false
+    });
+  }
+});
+</script>
 
 </body>
 </html>
