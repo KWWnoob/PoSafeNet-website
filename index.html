@@ -4,19 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PoSafeNet: Structured Safety Learning via Compositional Projection</title>
-  <meta name="description" content="PoSafeNet (NeurIPS 2026): a differentiable neural safety layer that enforces poset-structured safety constraints via sequential closed-form projection.">
+  <meta name="description" content="PoSafeNet is a poset-structured composable safety layer that realizes admissible safety overrides through differentiable closed-form CBF halfspace projections.">
   <meta name="keywords" content="PoSafeNet, safe learning, control barrier functions, partially ordered set, poset, structured safety, robot learning, NeurIPS 2026">
   <meta name="author" content="Kiwan Wong, Wei Xiao, Daniela Rus">
 
   <!-- Social preview (add static/images/social_preview.png, 1200x630, then use an absolute URL after deployment) -->
   <meta property="og:type" content="article">
-  <meta property="og:title" content="PoSafeNet: Safe Learning with Poset-Structured Neural Nets">
-  <meta property="og:description" content="A differentiable neural safety layer that enforces poset-structured safety via sequential closed-form projection. NeurIPS 2026.">
+  <meta property="og:title" content="PoSafeNet: Structured Safety Learning via Compositional Projection">
+  <meta property="og:description" content="A poset-structured composable safety layer for safe learning using sequential closed-form projections. NeurIPS 2026.">
   <meta property="og:image" content="static/images/social_preview.png">
   <meta name="twitter:card" content="summary_large_image">
 
   <!-- Google Scholar -->
-  <meta name="citation_title" content="PoSafeNet: Safe Learning with Poset-Structured Neural Nets">
+  <meta name="citation_title" content="PoSafeNet: Structured Safety Learning via Compositional Projection">
   <meta name="citation_author" content="Wong, Kiwan">
   <meta name="citation_author" content="Xiao, Wei">
   <meta name="citation_author" content="Rus, Daniela">
@@ -64,20 +64,20 @@
     <div class="container is-max-desktop has-text-centered">
       <div class="venue-badge">NeurIPS 2026</div>
       <h1 class="title is-1 publication-title">
-        <span class="title-accent">PoSafeNet</span>: Safe Learning with<br class="is-hidden-mobile"> Poset-Structured Neural Nets
+        <span class="title-accent">PoSafeNet</span>: Structured Safety Learning via<br class="is-hidden-mobile"> Compositional Projection
       </h1>
 
       <!-- TODO(authors): add personal homepage links to the author names if desired -->
       <div class="publication-authors">
         <span class="author-block">Kiwan Wong<sup>1</sup>,</span>
-        <span class="author-block">Wei Xiao<sup>2,1</sup>,</span>
-        <span class="author-block">Daniela Rus<sup>1</sup></span>
+        <span class="author-block">Wei Xiao<sup>2,3,1</sup>,</span>
+        <span class="author-block">Daniela Rus<sup>1,3</sup></span>
       </div>
       <div class="publication-affiliations">
         <span class="author-block"><sup>1</sup>MIT CSAIL</span>
-        <span class="author-block"><sup>2</sup>Nanyang Technological University</span>
+        <span class="author-block"><sup>2</sup>Nanyang Technological University; <sup>3</sup>Singapore-MIT Alliance for Research and Technology</span>
       </div>
-      <div class="publication-venue">Conference on Neural Information Processing Systems (NeurIPS), 2026</div>
+      <div class="publication-venue">40th Conference on Neural Information Processing Systems (NeurIPS 2026)</div>
 
       <div class="publication-links">
         <a class="link-button" href="https://arxiv.org/pdf/2601.22356" target="_blank" rel="noopener">
@@ -116,19 +116,18 @@
             data-label="Teaser figure"
             data-hint="Paper Fig. 1 (Figures/teaser_v3.pdf)">
       <figcaption>
-        <strong>Overview of PoSafeNet.</strong> A multi-head neural controller enforces safety through
-        sequential projections under multiple poset-consistent constraint orderings, and adaptively
-        combines the resulting safe executions via a soft mixture or a hard selection.
+        <strong>Overview of PoSafeNet.</strong> The framework replaces QP-based safety layers with multiple
+        closed-form projection heads, each following a valid constraint ordering derived from the given poset.
       </figcaption>
     </figure>
 
     <div class="tldr">
       <span class="tldr-label">TL;DR</span>
       <p>
-        Real robots must satisfy many safety constraints at once, but these constraints are rarely
-        equally important or fully ranked. PoSafeNet models them as a <em>partially ordered set</em>
-        and enforces them by <em>sequential closed-form projection</em> along poset-consistent orders,
-        so priority semantics hold by construction &mdash; without solving a differentiable QP.
+        When heterogeneous safety constraints conflict, not all can be satisfied simultaneously.
+        PoSafeNet uses a designer-specified <em>partially ordered set</em> to encode admissible overrides
+        and executes them through <em>sequential closed-form projections</em> onto CBF-induced halfspaces,
+        without solving an online QP.
       </p>
     </div>
 
@@ -136,24 +135,26 @@
       <div class="contrib-card">
         <div class="contrib-num">01</div>
         <h3>Poset-structured safety</h3>
-        <p>A structural inductive bias for learning-based control that enables selective,
-          context-dependent resolution of heterogeneous safety priorities.</p>
+        <p>A designer-specified partial order encodes which safety constraints may override others,
+          leaving incomparable constraints without artificial priority rankings.</p>
       </div>
       <div class="contrib-card">
         <div class="contrib-num">02</div>
         <h3>Poset-respecting by construction</h3>
-        <p>Lower-priority constraints are violated only when necessary to enforce higher-priority ones.</p>
+        <p>Each head follows a linear extension: a later correction may override an earlier
+          lower-priority or incomparable constraint, but never a higher-priority comparable one.</p>
       </div>
       <div class="contrib-card">
         <div class="contrib-num">03</div>
         <h3>Closed-form &amp; efficient</h3>
-        <p>Safety is enforced by closed-form half-space projections, without solving differentiable QPs.</p>
+        <p>CBF-induced halfspaces are enforced through differentiable closed-form
+          projections, without an online differentiable QP solver.</p>
       </div>
       <div class="contrib-card">
         <div class="contrib-num">04</div>
         <h3>Guarantees &amp; experiments</h3>
-        <p>Formal poset-respecting safety under standard assumptions, evaluated on navigation,
-          manipulation, and vision-based driving.</p>
+        <p>Poset-respecting hard selection and conditional mixture guarantees are studied alongside
+          simulated navigation, manipulation, and vision-based driving experiments.</p>
       </div>
     </div>
   </div>
@@ -165,19 +166,20 @@
     <h2 class="section-title">Abstract</h2>
     <div class="abstract-text">
       <p>
-        Safe learning is essential for deploying learning-based controllers in safety-critical robotic systems,
-        yet existing approaches often enforce multiple safety constraints uniformly or via fixed priority orders,
-        leading to infeasibility and brittle behavior.
-        In practice, safety requirements are heterogeneous and admit only partial priority relations,
-        where some constraints are comparable while others are inherently incomparable.
-        We formalize this setting as <em>poset-structured safety</em>, modeling safety constraints as a partially
-        ordered set and treating safety composition as a structural property of the policy class.
-        Building on this formulation, we propose PoSafeNet, a differentiable neural safety layer that enforces
-        safety via sequential closed-form projection under poset-consistent constraint orderings, enabling adaptive
-        selection or mixing of valid safety executions while preserving priority semantics by construction.
-        Experiments on multi-obstacle navigation, constrained robot manipulation, and vision-based autonomous
-        driving demonstrate improved feasibility, robustness, and scalability over unstructured and differentiable
-        quadratic program-based safety layers.
+        Safe robot learning often involves multiple heterogeneous safety constraints that
+        cannot always be satisfied simultaneously. Existing neural safety layers typically
+        treat multi-constraint safety as a numerical optimization problem, enforcing all
+        constraints through a single QP-based projection or relaxing conflicts with slack
+        variables. This hides the semantic question of which constraints may be sacrificed
+        under conflict inside solver geometry, penalty weights, or a fixed total hierarchy.
+        We propose PoSafeNet, a poset-structured composable safety layer that makes
+        these conflict semantics explicit. PoSafeNet encodes admissible safety override
+        relations as a partial order and realizes each admissible execution by composing
+        closed-form projections onto Control Barrier Function (CBF)-induced halfspaces.
+        Across multi-obstacle navigation, constrained manipulation, and vision-based
+        autonomous driving, PoSafeNet improves operational feasibility, computational
+        efficiency, and task performance over Differentiable Quadratic Program (dQP)-based,
+        slack-based, and hierarchical safety layers.
       </p>
     </div>
   </div>
@@ -188,46 +190,48 @@
   <div class="container is-max-desktop">
     <h2 class="section-title">Motivation</h2>
     <p class="lead">
-      Most safe learning approaches implicitly assume that multiple safety constraints can be enforced
-      <em>symmetrically and simultaneously</em>, typically through a single optimization-based safety layer such
-      as a differentiable QP or differentiable MPC. In realistic robotic systems, however, safety constraints are
-      heterogeneous: they arise from distinct failure modes, physical limitations, and sensing modalities.
+      Safe robot learning often involves constraints arising from different failure modes,
+      physical limits, and sensing modalities. These constraints cannot always be enforced
+      <em>symmetrically and simultaneously</em>: collision avoidance, lane keeping, joint limits,
+      and task tracking may require conflicting control corrections. A safety layer must specify
+      which requirements take precedence when constraints are incompatible.
     </p>
 
     <div class="compare-grid">
       <div class="compare-card is-bad">
         <div class="compare-head">Simultaneous enforcement</div>
         <div class="compare-sub">flat intersection, e.g. a single dQP</div>
-        <p>Forces the policy to resolve priority conflicts implicitly through optimization, which may lead to
-          infeasibility, excessive conservativeness, or unstable learning under noise and model mismatch.
-          Slack variables restore feasibility but allow violations of higher-priority constraints.</p>
+        <p>Single dQP or dMPC layers enforce multiple constraints jointly. Conflicting constraints can
+          make the optimization infeasible or difficult to differentiate, while slack relaxation
+          can weaken the intended safety semantics.</p>
       </div>
       <div class="compare-card is-bad">
         <div class="compare-head">Fixed total order</div>
         <div class="compare-sub">hierarchical / lexicographic</div>
-        <p>Imposes arbitrary priorities between constraints that are inherently incomparable &mdash;
-          e.g. the left and right lane boundaries in driving are individually valid yet structurally
-          incomparable safety primitives.</p>
+        <p>Fixed lexicographic hierarchies rank every constraint pair, even when no semantic
+          override is intended &mdash; for example, left and right lane boundaries are treated
+          as incomparable in the driving safety poset.</p>
       </div>
       <div class="compare-card is-good">
         <div class="compare-head">Partial order (PoSafeNet)</div>
         <div class="compare-sub">poset over safety primitives</div>
-        <p>Encodes <em>only</em> the necessary priority relations while leaving incomparable constraints unranked
-          &mdash; the minimal structure needed. The poset is a prior specified by the designer, not a learned object.</p>
+        <p>Encodes <em>only</em> the intended safety override relations while leaving unrelated
+          constraints incomparable. The safety poset is specified by the designer; the network
+          learns how to act within its admissible executions.</p>
       </div>
     </div>
 
     <blockquote class="key-question">
-      How can we compose multiple safety-critical policies in a scalable and adaptive manner when the underlying
-      safety constraints admit only a partial order, rather than a single global priority?
+      How should multiple heterogeneous safety constraints be composed when they conflict,
+      without introducing arbitrary priorities or hiding safety trade-offs inside a solver?
     </blockquote>
 
     <p>
-      The central limitation of existing approaches lies not in the availability of safety certificates themselves,
-      but in the absence of a <strong>structural inductive bias</strong> governing how such constraints should be
-      composed. PoSafeNet casts safety composition as a <em>structured latent decision problem</em>: the policy
-      operates over a discrete set of safety-respecting executions rather than over unconstrained control actions,
-      decoupling the specification of safety structure from the learning of task behavior.
+      PoSafeNet separates the <strong>semantics of safety conflicts</strong> from the computation
+      of control corrections. A designer-specified poset defines admissible override relations,
+      while a <em>structured set of linear extensions</em> determines the sequential projection
+      executions available to the learned policy. This replaces implicit solver trade-offs with
+      an explicit safety-composition prior.
     </p>
   </div>
 </section>
@@ -316,10 +320,10 @@
       </div>
       <figcaption>
         <strong>Architecture (schematic of Algorithm 1).</strong> A multi-head network produces nominal controls
-        \(\mathbf{u}^{(h)}_{\mathrm{nom}}\); each head projects its control sequentially onto the constraint
-        half-spaces following a fixed linear extension \(\sigma^{(h)}\) of the safety poset (different heads use
-        different admissible orders). The safe head outputs are then combined by a convex mixture or by
-        (Gumbel-softmax) hard selection.
+        \(\mathbf{u}^{(h)}_{\mathrm{nom}}\); each head sequentially projects its nominal action onto
+        CBF-induced halfspaces following a fixed linear extension \(\sigma^{(h)}\) of the given safety poset.
+        Head outputs are then combined by a learned convex mixture or a hard selection, with
+        Gumbel-softmax used to relax hard selection during training.
       </figcaption>
     </figure>
 
@@ -328,9 +332,9 @@
       <div class="step-body">
         <h3>Safety constraints as half-space projections</h3>
         <p>
-          For control-affine systems \(\dot{\mathbf{x}} = f(\mathbf{x}) + g(\mathbf{x})\mathbf{u}\), enforcing a
-          safety constraint \(b_j(\mathbf{x}) \ge 0\) (e.g. via a control barrier function) induces an affine
-          condition on the control input, i.e. a half-space:
+          For control-affine systems \(\dot{\mathbf{x}} = f(\mathbf{x}) + g(\mathbf{x})\mathbf{u}\),
+          relative-degree-one CBFs and high-order CBFs (HOCBFs) induce affine control
+          inequalities for each safety constraint \(b_j(\mathbf{x}) \ge 0\), defining a halfspace:
         </p>
         <div class="equation">$$H_j(\mathbf{x}) := \big\{\,\mathbf{u}\in\mathbb{R}^m \;\big|\; A_j(\mathbf{x})\,\mathbf{u} \ge c_j(\mathbf{x})\,\big\}.$$</div>
         <p>Projecting a control onto this half-space,
@@ -339,12 +343,12 @@
         <div class="equation highlight-eq">$$\Pi_j(\mathbf{u}) = \mathbf{u} + \frac{\mathrm{ReLU}\big(c_j(\mathbf{x}) - A_j(\mathbf{x})\,\mathbf{u}\big)}{\|A_j(\mathbf{x})\|^2}\, A_j(\mathbf{x})^{\top}.$$</div>
         <p>
           If the constraint is already satisfied, \(\Pi_j(\mathbf{u}) = \mathbf{u}\); otherwise the ReLU term applies the
-          minimal correction that restores feasibility. Each constraint thus acts as an <em>operator</em> on the control
+          minimal correction that satisfies that halfspace. Each constraint thus acts as an <em>operator</em> on the control
           input rather than as a penalty in the loss.
           <span class="aside-note"><strong>Learnable tightness.</strong> For a CBF condition
-          \(\dot b_j(\mathbf{x},\mathbf{u}) \ge -\kappa_j\, b_j(\mathbf{x})\), the gain \(\kappa_j\) is learned jointly with
-          the policy, adjusting how conservative each constraint is while preserving the half-space structure for any
-          \(\kappa_j \ge 0\).</span>
+          \(\dot b_j(\mathbf{x},\mathbf{u}) \ge -\kappa_j\, b_j(\mathbf{x})\), PoSafeNet learns \(\kappa_j\)
+          jointly with the policy, parameterizing \(\kappa_j=\operatorname{sigmoid}(\rho_j)\) so the gain remains
+          in \((0,1)\) and the CBF condition remains affine in control.</span>
         </p>
       </div>
     </div>
@@ -356,8 +360,8 @@
         <p>Multiple constraints are composed by applying their projection operators one after another along an
           ordering \(\sigma = (j_1,\dots,j_N)\):</p>
         <div class="equation">$$\begin{gathered} \mathbf{u}^{(0)} = \mathbf{u}_{\mathrm{nom}}, \qquad \mathbf{u}^{(k)} = \Pi_{j_k}\!\big(\mathbf{u}^{(k-1)}\big),\quad k = 1,\dots,N, \\ \mathbf{u}_\sigma = \mathbf{u}^{(N)}. \end{gathered}$$</div>
-        <p>Different orders can yield different actions from the same nominal input &mdash; which is exactly why a
-          principled structure over admissible orders is needed.</p>
+        <p>Different orders can yield different corrections from the same nominal control. Later projections
+          can invalidate earlier constraints, whereas the last-projected constraint remains satisfied by that execution.</p>
       </div>
     </div>
 
@@ -369,7 +373,8 @@
           Constraints \(\mathcal{S}=\{1,\dots,N\}\) carry a partial order \(\preceq\), where \(i \prec j\) means
           constraint \(j\) has strictly higher priority than \(i\). A total order \(\sigma\) is a <em>linear extension</em>
           of \((\mathcal{S},\preceq)\) if \(i \prec j\) implies that \(i\) appears before \(j\) in \(\sigma\) &mdash;
-          so a higher-priority constraint is always enforced later and can override a lower-priority one, never the reverse.
+          so a strictly lower-priority comparable constraint cannot override a higher-priority one. Incomparable
+          constraints are resolved by the selected admissible execution.
         </p>
         <figure class="media-slot figure-card figure-narrow"
                 data-kind="image"
@@ -383,22 +388,23 @@
           </figcaption>
         </figure>
         <div class="theorem-box">
-          <div class="theorem-title">Definition (Poset-respecting safety)</div>
-          <p>A policy satisfies poset-respecting safety if safety is enforced according to some linear extension of
-            \(\preceq\), such that a constraint \(i\) may be violated only when enforcing a constraint \(j\) with strictly
-            higher priority, \(i \prec j\).</p>
+          <div class="theorem-title">Definition 3.1 (Poset-respecting safety)</div>
+          <p>A safety correction is poset-respecting when its execution order is a linear extension of
+            \(\preceq\). If a later projection onto \(j\) invalidates an earlier constraint \(i\),
+            the override is admissible only when \(i \prec j\) or \(i \parallel j\).
+            This does not assert simultaneous feasibility of all constraints.</p>
         </div>
         <div class="theorem-box">
-          <div class="theorem-title">Corollary (Poset consistency of linear extensions)</div>
+          <div class="theorem-title">Proposition 4.1 (Poset consistency of linear extensions)</div>
           <p>For any linear extension \(\sigma\) of the safety poset, sequential enforcement along \(\sigma\) satisfies
             poset-respecting safety.</p>
         </div>
         <div class="theorem-box">
-          <div class="theorem-title">Theorem (Sequential projection and antichain mixing)</div>
-          <p>If a policy enforces constraints by sequential projection along linear extensions of the poset and combines
-            executions only through permutations within antichains, and if projecting onto one of two incomparable
-            constraints does not violate feasibility of the other, then the policy satisfies poset-respecting safety.
-            Geometrically, the half-spaces of incomparable constraints must intersect robustly, avoiding acute corners.</p>
+          <div class="theorem-title">Theorem 4.2 (Hard selection) and Proposition 4.3 (Mixture)</div>
+          <p>Selecting any single head corresponding to a valid linear extension guarantees poset-respecting
+            safety, but not simultaneous satisfaction of every CBF. A convex mixture preserves a given
+            halfspace when every participating head output satisfies it; wider guarantees require
+            non-conflicting or non-interfering constraints.</p>
         </div>
       </div>
     </div>
@@ -409,30 +415,31 @@
         <h3>Multi-head architecture, head combination, and training</h3>
         <p>PoSafeNet produces \(H\) nominal controls, each tied to a fixed linear extension \(\sigma^{(h)}\):
           \(\mathbf{u}^{(h)} = \Pi_{\sigma^{(h)}}\big(\mathbf{u}^{(h)}_{\mathrm{nom}}\big)\).
-          During training the heads are combined by a convex mixture with global coefficients,</p>
+          Head outputs can be combined by a convex mixture with nonnegative weights,</p>
         <div class="equation">$$\mathbf{u} = \sum_{h=1}^{H} \alpha_h\, \mathbf{u}^{(h)}, \qquad \alpha_h \ge 0,\ \ \sum_h \alpha_h = 1,$$</div>
-        <p>or, alternatively, a single head is sampled differentiably with Gumbel-softmax. At inference a single head is
-          selected or a fixed mixture is applied. The model is trained by imitation learning,
+        <p>or a single head is selected. Mixture weights and selection logits may be state-dependent or global;
+          Gumbel-softmax relaxes hard selection during training, followed by deterministic selection at inference.
+          The model is trained by imitation learning,
           \(\mathcal{L}(\boldsymbol{\theta}) = \mathbb{E}_{(\mathbf{x},\mathbf{z},\mathbf{u}^*)\sim\mathcal{D}}
           \big[\ell(\mathbf{u}^*, \mathbf{u}(\mathbf{x},\mathbf{z};\boldsymbol{\theta}))\big]\), with gradients flowing
           through the closed-form projections.</p>
         <div class="callout">
-          <strong>Safety remark.</strong> Hard head selection is always safe, since it executes one poset-consistent
-          linear extension. Convex mixtures preserve safety only under additional geometric assumptions (all heads in a
-          common intersection of half-spaces, or mutually non-conflicting incomparable constraints); otherwise the mixture
-          is an empirical performance heuristic. The navigation and manipulation tasks satisfy the sufficient conditions;
-          for vision-based driving, safety should be interpreted as empirical.
+          <strong>Safety remark.</strong> Hard head selection always respects the poset override semantics,
+          but later projections may invalidate earlier constraints. The last-projected maximal constraint remains
+          satisfied. Mixtures preserve a halfspace if all contributing heads satisfy it, or under suitable
+          non-interference conditions. Poset consistency alone does not imply forward invariance; it follows only
+          for CBF constraints satisfied by the final applied control along the trajectory.
         </div>
       </div>
     </div>
 
     <details class="algo-box">
-      <summary>Algorithm 1 &mdash; Construction and training of PoSafeNet</summary>
+      <summary>Algorithm 1 &mdash; Construction and inference of PoSafeNet</summary>
       <ol class="algo-list">
         <li><strong>Input:</strong> dynamics \(\dot{\mathbf{x}} = f(\mathbf{x}) + g(\mathbf{x})\mathbf{u}\); CBF constraints \(\{b_i(\mathbf{x})\ge 0\}_{i\in\mathcal{S}}\) with poset \((\mathcal{S},\preceq)\); linear extensions \(\{\sigma^{(h)}\}_{h=1}^{H}\).</li>
         <li>Initialize nominal policies \(\{\mathbf{u}^{(h)}_{\mathrm{nom}}\}_{h=1}^{H}\).</li>
-        <li>Initialize mixture weights \(\boldsymbol{\alpha}\) or Gumbel logits \(\boldsymbol{\gamma}\).</li>
-        <li>Construct control-feasible half-spaces \(H_i(\mathbf{x})\) and projection operators \(\Pi_i\).</li>
+        <li>Use mixture weights \(\boldsymbol{\alpha}\) or hard-selection logits \(\boldsymbol{\gamma}\).</li>
+        <li>Compute the CBF-induced half-spaces \(H_i(\mathbf{x})\) and projection operators \(\Pi_i\).</li>
         <li><strong>for</strong> \(h = 1,\dots,H\): \(\ \mathbf{u}^{(h)} \leftarrow \mathbf{u}^{(h)}_{\mathrm{nom}}(\mathbf{x},\mathbf{z})\); <strong>for</strong> \(j \in \sigma^{(h)}\): \(\ \mathbf{u}^{(h)} \leftarrow \Pi_j(\mathbf{u}^{(h)};\mathbf{x})\).</li>
         <li>Select or mix \(\{\mathbf{u}^{(h)}\}\) using \(\boldsymbol{\alpha}\) or Gumbel-softmax to obtain \(\mathbf{u}(\mathbf{x},\mathbf{z})\).</li>
       </ol>
@@ -445,27 +452,27 @@
   <div class="container is-max-desktop">
     <h2 class="section-title">Experimental Results</h2>
     <p class="lead">
-      PoSafeNet is compared against an end-to-end network (E2E) and unstructured safety layers &mdash; BarrierNet,
-      ABNet, and DFBNet &mdash; which flatten all constraints into a single layer or introduce slack variables.
-      Here we highlight the vision-based end-to-end driving experiment; results on 2D multi-obstacle navigation and
-      constrained robot manipulation are reported in the <a href="https://arxiv.org/abs/2601.22356" target="_blank" rel="noopener">paper</a>.
+      We compare PoSafeNet against end-to-end learning (E2E), unstructured safety layers
+      (BarrierNet, ABNet, and DFBNet), and fixed-hierarchy optimization (HQP).
+      Here we highlight VISTA vision-based autonomous driving; multi-obstacle navigation
+      and constrained manipulation are also evaluated in the <a href="https://arxiv.org/abs/2601.22356" target="_blank" rel="noopener">paper</a>.
     </p>
 
     <div class="highlight-grid">
       <div class="highlight-card">
         <div class="highlight-task">VISTA driving</div>
-        <div class="highlight-value">100%</div>
-        <div class="highlight-desc">pass rate (rollouts completed without collision) for both PoSafeNet variants</div>
+        <div class="highlight-value">0.00 ± 0.00</div>
+        <div class="highlight-desc">mean crash rate for both variants in the two- and four-layer VISTA settings</div>
       </div>
       <div class="highlight-card">
         <div class="highlight-task">VISTA driving</div>
-        <div class="highlight-value">0%</div>
-        <div class="highlight-desc">crash rate for both PoSafeNet variants</div>
+        <div class="highlight-value">68.78 ± 5.66</div>
+        <div class="highlight-desc">progress for PoSafeNet (Mixture) with the two-layer hierarchy</div>
       </div>
       <div class="highlight-card">
         <div class="highlight-task">VISTA driving</div>
-        <div class="highlight-value">1.23 / 2.73</div>
-        <div class="highlight-desc">minimum safety barrier value (Mixture / Hard) &mdash; positive, i.e. no obstacle-safety violation</div>
+        <div class="highlight-value">0.001 ± 0.003</div>
+        <div class="highlight-desc">time ratio out-of-lane for PoSafeNet (Mixture) with the four-layer hierarchy</div>
       </div>
     </div>
 
@@ -474,8 +481,9 @@
     <p>
       Timing is measured with three simultaneously active CBF constraints. ABNet is evaluated with its dQP
       (<code>qpth</code>) implementation, since its closed form does not generalize to three constraints.
-      PoSafeNet's cost is comparable to standard neural networks up to a small constant factor, scales near-linearly in
-      the number of heads, and is significantly faster than QP-based safety layers.
+      PoSafeNet has comparable overhead to standard neural networks up to a small constant factor and scales
+      near-linearly in instantiated heads. This benchmark does not measure scaling with poset size or the
+      number of distinct linear extensions.
     </p>
     <div class="columns is-variable is-4">
       <div class="column">
@@ -483,7 +491,7 @@
                 data-kind="image"
                 data-src="static/images/batch_time.png"
                 data-label="Inference time vs. batch size"
-                data-hint="Paper Fig. 3a (Figures/Batchtime.pdf)">
+                data-hint="Appendix Fig. 4a (Figures/Batchtime.pdf)">
           <figcaption>Inference (forward-only) time versus batch size with \(H=10\) (log scale).</figcaption>
         </figure>
       </div>
@@ -492,26 +500,28 @@
                 data-kind="image"
                 data-src="static/images/head_time.png"
                 data-label="Training time vs. number of heads"
-                data-hint="Paper Fig. 3b (Figures/Headtime.pdf)">
+                data-hint="Appendix Fig. 4b (Figures/Headtime.pdf)">
           <figcaption>Training time per step versus number of heads with \(B=128\) (log scale).</figcaption>
         </figure>
       </div>
     </div>
 
     <p class="protocol-note">
-      <strong>Protocol.</strong> Safety (min / mean) is the minimum and average task-specific barrier value over a
-      rollout (negative = violation). Values are normalized per task and comparable only within each table.
-      All methods use identical settings and training protocols. Rows for PoSafeNet are highlighted.
+      <strong>Protocol.</strong> The VISTA table reports mean ± standard deviation over four seeds
+      \(\{0,1,2,42\}\). Obstacle Safety (min) denotes the minimum obstacle-barrier value over a
+      rollout (negative indicates violation); crash and lane-departure metrics measure separate outcomes.
+      Rows for PoSafeNet are highlighted.
     </p>
 
     <!-- ---------- Experiment 3 ---------- -->
     <div class="experiment-block">
       <h3 class="subsection-title"><span class="exp-tag">VISTA</span> Vision-based end-to-end autonomous driving</h3>
       <p>
-        Policies map raw camera images to controls in the <code>VISTA</code> data-driven simulator. Safety constraints include
-        collision avoidance and lane keeping; collision avoidance takes precedence, so lane keeping may be temporarily
-        violated to preserve higher-priority safety. BarrierNet and ABNet are also reported without lane constraints for
-        comparability. Results on the held-out test set.
+        In the <code>VISTA</code> data-driven simulator, the nominal policy maps RGB images to control actions,
+        while the CBF layer uses simulator ground-truth state, lane geometry, and obstacle positions.
+        The two-layer poset prioritizes obstacle avoidance over incomparable lane constraints; the four-layer
+        poset adds speed regulation and centerline adherence as lower-priority objectives. Results are mean ±
+        standard deviation over four seeds (0, 1, 2, 42).
       </p>
       <figure class="media-slot figure-card figure-narrow"
               data-kind="image"
@@ -552,20 +562,20 @@
           </tbody>
         </table>
       </div>
-      <p class="table-note">Lane viol. reports lane margin (negative = departure); |e<sub>y</sub>| is lateral deviation from the lane
-        centerline; Pass% counts rollouts completed without collision; Rot viol. is the mean rotation-rate magnitude.
-        PoSafeNet trades a slight increase in mean deviation for consistent adherence to safety priorities; the mixture
-        steers more smoothly with lower lane violation and control variance, while the hard variant commits to one side
-        of the lane.</p>
+      <p class="table-note">Obstacle Safety (min) is the minimum obstacle-barrier margin over a rollout
+        (nonnegative indicates satisfaction); Crash is the collision rate, which can be zero even when
+        a barrier margin is negative. Lane margin (min) is negative on departure, and |e<sub>y</sub>|
+        is the mean absolute lateral deviation. Hard selection has higher mean progress but more time
+        outside the lane than Mixture in both reported hierarchies.</p>
 
       <figure class="media-slot figure-card"
               data-kind="image"
               data-src="static/images/exp3_traj.png"
               data-label="Driving trajectories"
-              data-hint="Paper Fig. 6 (Figures/Experiment3_traj2.pdf)">
-        <figcaption>Representative closed-loop driving trajectories in VISTA. Unstructured baselines exhibit unstable
-          behavior near obstacles or lane departures; PoSafeNet maintains collision avoidance and lane adherence,
-          consistent with the priority of collision avoidance over lane keeping.</figcaption>
+              data-hint="Paper Fig. 3 (Figures/Experiment3_traj2.pdf)">
+        <figcaption>Representative closed-loop VISTA trajectories (Figure 3). Dashed lines denote baselines,
+          while solid lines denote PoSafeNet variants. Several baselines collide or make limited progress,
+          whereas PoSafeNet avoids obstacle collisions and continues forward in these examples.</figcaption>
       </figure>
 
       <figure class="media-slot figure-card"
@@ -600,7 +610,7 @@
     </div>
     <!-- TODO(authors): switch to the NeurIPS 2026 @inproceedings entry once the proceedings BibTeX is available -->
     <pre id="bibtex-code"><code>@article{wong2026posafenet,
-  title   = {PoSafeNet: Safe Learning with Poset-Structured Neural Nets},
+  title   = {PoSafeNet: Structured Safety Learning via Compositional Projection},
   author  = {Wong, Kiwan and Xiao, Wei and Rus, Daniela},
   journal = {arXiv preprint arXiv:2601.22356},
   year    = {2026}
